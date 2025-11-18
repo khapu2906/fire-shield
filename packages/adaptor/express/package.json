@@ -1,0 +1,65 @@
+{
+  "name": "@fire-shield/express",
+  "version": "2.0.0",
+  "description": "Fire Shield Express.js adapter - Lightning-fast RBAC middleware for Express",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "eslint lib/**/*.ts",
+    "lint:fix": "eslint lib/**/*.ts --fix"
+  },
+  "keywords": [
+    "rbac",
+    "express",
+    "middleware",
+    "authorization",
+    "permissions",
+    "fire-shield",
+    "access-control",
+    "security"
+  ],
+  "author": "Fire Shield Team",
+  "license": "DIB",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fire-shield/fire-shield.git",
+    "directory": "packages/express"
+  },
+  "homepage": "https://github.com/fire-shield/fire-shield#readme",
+  "bugs": {
+    "url": "https://github.com/fire-shield/fire-shield/issues"
+  },
+  "peerDependencies": {
+    "express": "^4.0.0"
+  },
+  "dependencies": {
+    "@fire-shield/core": "2.0.6"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "express": "^4.18.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
