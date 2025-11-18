@@ -264,9 +264,9 @@ Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.m
 ## 🔗 Links
 
 - **NPM:** [@fire-shield/core](https://www.npmjs.com/package/@fire-shield/core)
-- **GitHub:** [github.com/khapu9206/fire-shield](https://github.com/khapu9206/fire-shield)
+- **GitHub:** [github.com/khapu2906/fire-shield](https://github.com/khapu2906/fire-shield)
 - **Documentation:** [Full Docs](./core/README.md)
-- **Issues:** [Report a bug](https://github.com/khapu9206/fire-shield/issues)
+- **Issues:** [Report a bug](https://github.com/khapu2906/fire-shield/issues)
 
 ---
 

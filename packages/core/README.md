@@ -278,8 +278,8 @@ DIB
 
 - **Documentation:** [`docs/`](./docs/)
 - **Examples:** [`examples/`](./examples/)
-- **GitHub:** [github.com/khapu9206/fire-shield](https://github.com/khapu9206/fire-shield)
-- **Issues:** [github.com/khapu9206/fire-shield/issues](https://github.com/khapu9206/fire-shield/issues)
+- **GitHub:** [github.com/khapu2906/fire-shield](https://github.com/khapu2906/fire-shield)
+- **Issues:** [github.com/khapu2906/fire-shield/issues](https://github.com/khapu2906/fire-shield/issues)
 - **NPM:** [npmjs.com/package/@fire-shield/core](https://npmjs.com/package/@fire-shield/core)
 
 ---
