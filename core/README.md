@@ -272,7 +272,7 @@ Contributions are welcome! Please:
 
 ## 📄 License
 
-MIT
+DIB
 
 ## 🔗 Links
 

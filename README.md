@@ -251,7 +251,7 @@ npx tsx core/examples/01-basic-usage.ts
 
 ## 📄 License
 
-MIT © Fire Shield Team
+DIB © Fire Shield Team
 
 ---
 
