@@ -1,0 +1,49 @@
+{
+	"name": "fire-shield",
+	"version": "1.0.0",
+	"description": "Flexible RBAC (Role-Based Access Control) package with adapters for multiple frameworks",
+	"private": true,
+	"workspaces": [
+		"core",
+		"adaptor/*"
+	],
+	"scripts": {
+		"build": "turbo run build",
+		"build:core": "turbo run build --filter=@rbac/core",
+		"build:adaptors": "turbo run build --filter=./adaptor/*",
+		"dev": "turbo run dev",
+		"test": "turbo run test",
+		"test:core": "turbo run test --filter=@rbac/core",
+		"lint": "turbo run lint",
+		"typecheck": "turbo run typecheck",
+		"clean": "turbo run clean",
+		"release": "turbo run build && changeset publish"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.26.0",
+		"@typescript-eslint/eslint-plugin": "^6.0.0",
+		"@typescript-eslint/parser": "^6.0.0",
+		"eslint": "^8.0.0",
+		"turbo": "^2.6.1",
+		"typescript": "^5.0.0"
+	},
+	"packageManager": "npm@9.0.0",
+	"engines": {
+		"node": ">=18.0.0",
+		"npm": ">=9.0.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/khapu2906/fire-shield.git"
+	},
+	"keywords": [
+		"rbac",
+		"authorization",
+		"permissions",
+		"access-control",
+		"security",
+		"monorepo"
+	],
+	"author": "RBAC Team",
+	"license": "MIT"
+}
