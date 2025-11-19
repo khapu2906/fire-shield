@@ -1,0 +1,36 @@
+{
+  "name": "@fire-shield/vue",
+  "version": "2.0.0",
+  "description": "Vue adapter for RBAC with composables, directives, and navigation guards",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": ["rbac", "vue", "composables", "directives", "guards", "authorization", "vue-router"],
+  "author": "Fire Shield Team",
+  "license": "DIB",
+  "dependencies": {
+    "@fire-shield/core": "^2.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "vue": "^3.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vue-router": {
+      "optional": true
+    }
+  }
+}
