@@ -4,7 +4,7 @@
  */
 
 import { RBAC } from '../lib/index';
-import type { RBACConfigSchema } from '../lib/config/types';
+import type { RBACConfigSchema } from '../lib/types/config.types';
 
 // Define custom config for a blog application
 const blogConfig: RBACConfigSchema = {
@@ -55,7 +55,6 @@ const blogConfig: RBACConfigSchema = {
 	options: {
 		autoBitAssignment: false, // Using manual bits
 		startBitValue: 512, // For any future auto-assigned permissions
-		persistState: false,
 		strictMode: true, // Throw errors on invalid operations
 	},
 };

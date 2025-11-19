@@ -3,7 +3,7 @@
  * Shows how to use RBAC with builder pattern
  */
 
-import { RBACBuilder } from '../lib/builder';
+import { RBACBuilder } from '../lib/index';
 
 // Create RBAC system using builder
 const rbac = new RBACBuilder()
