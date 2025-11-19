@@ -254,6 +254,6 @@ DIB © Fire Shield Team
 
 ## Links
 
-- [Fire Shield Core](https://github.com/fire-shield/fire-shield/tree/main/packages/core)
+- [Fire Shield Core](https://github.com/khapu2906/fire-shield/tree/main/packages/core)
 - [Hono Documentation](https://hono.dev)
 - [NPM](https://www.npmjs.com/package/@fire-shield/hono)
