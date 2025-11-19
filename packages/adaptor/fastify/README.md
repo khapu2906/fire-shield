@@ -143,6 +143,6 @@ DIB © Fire Shield Team
 
 ## Links
 
-- [Fire Shield Core](https://github.com/fire-shield/fire-shield/tree/main/packages/core)
-- [Documentation](https://github.com/fire-shield/fire-shield#readme)
+- [Fire Shield Core](https://github.com/khapu2906/fire-shield/tree/main/packages/core)
+- [Documentation](https://github.com/khapu2906/fire-shield#readme)
 - [NPM](https://www.npmjs.com/package/@fire-shield/fastify)

@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/fastify",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Fastify adapter for RBAC authorization hooks",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,10 @@
     "fastify",
     "hooks",
     "authorization",
-    "permissions"
+    "permissions",
+    "fire-shield",
+    "access-control",
+    "security"
   ],
   "author": "Fire Shield Team",
   "license": "DIB",
@@ -48,5 +51,14 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khapu2906/fire-shield.git",
+    "directory": "packages/adaptor/fastify"
+  },
+  "homepage": "https://github.com/khapu2906/fire-shield#readme",
+  "bugs": {
+    "url": "https://github.com/khapu2906/fire-shield/issues"
   }
 }
