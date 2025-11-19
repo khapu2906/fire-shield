@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@fire-shield/core':
-        specifier: 2.0.6
-        version: 2.0.6
+        specifier: 2.0.8
+        version: 2.0.8
     devDependencies:
       '@types/express':
         specifier: ^4.17.0
@@ -348,8 +348,8 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@fire-shield/core@2.0.6':
-    resolution: {integrity: sha512-foTCikgP1TDCRMLh6i1jbYd+z6dZCyt0lfyT0oaMehPDtaIx595h0gtCZh7/KItNxBVGDJjrd95jOHjRtYNUDA==}
+  '@fire-shield/core@2.0.8':
+    resolution: {integrity: sha512-kc04p5CUU8KKGAhJnZp1oYHYqlIeAmyQEC3Up6aF/AUhymh2jGUKWtvo4lsaIvXWSzis6T2qdOJXrr1KHKUYCQ==}
     engines: {node: '>=18.0.0'}
 
   '@humanwhocodes/config-array@0.13.0':
@@ -1815,7 +1815,7 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@fire-shield/core@2.0.6': {}
+  '@fire-shield/core@2.0.8': {}
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:

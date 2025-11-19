@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/fastify",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Fastify adapter for RBAC authorization hooks",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,7 +36,7 @@
     "fastify": "^5.6.2"
   },
   "dependencies": {
-    "@fire-shield/core": "^2.0.6"
+    "@fire-shield/core": "^2.0.8"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

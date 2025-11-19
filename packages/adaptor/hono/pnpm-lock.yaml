@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@fire-shield/core':
-        specifier: ^2.0.6
-        version: 2.0.6
+        specifier: ^2.0.8
+        version: 2.0.8
       hono:
         specifier: 4.10.6
         version: 4.10.6
@@ -321,8 +321,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fire-shield/core@2.0.6':
-    resolution: {integrity: sha512-foTCikgP1TDCRMLh6i1jbYd+z6dZCyt0lfyT0oaMehPDtaIx595h0gtCZh7/KItNxBVGDJjrd95jOHjRtYNUDA==}
+  '@fire-shield/core@2.0.8':
+    resolution: {integrity: sha512-kc04p5CUU8KKGAhJnZp1oYHYqlIeAmyQEC3Up6aF/AUhymh2jGUKWtvo4lsaIvXWSzis6T2qdOJXrr1KHKUYCQ==}
     engines: {node: '>=18.0.0'}
 
   '@isaacs/cliui@8.0.2':
@@ -1170,7 +1170,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.0':
     optional: true
 
-  '@fire-shield/core@2.0.6': {}
+  '@fire-shield/core@2.0.8': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:

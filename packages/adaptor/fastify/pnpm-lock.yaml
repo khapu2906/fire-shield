@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@fire-shield/core':
-        specifier: ^2.0.6
-        version: 2.0.6
+        specifier: ^2.0.8
+        version: 2.0.8
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -363,8 +363,8 @@ packages:
   '@fastify/proxy-addr@5.1.0':
     resolution: {integrity: sha512-INS+6gh91cLUjB+PVHfu1UqcB76Sqtpyp7bnL+FYojhjygvOPA9ctiD/JDKsyD9Xgu4hUhCSJBPig/w7duNajw==}
 
-  '@fire-shield/core@2.0.6':
-    resolution: {integrity: sha512-foTCikgP1TDCRMLh6i1jbYd+z6dZCyt0lfyT0oaMehPDtaIx595h0gtCZh7/KItNxBVGDJjrd95jOHjRtYNUDA==}
+  '@fire-shield/core@2.0.8':
+    resolution: {integrity: sha512-kc04p5CUU8KKGAhJnZp1oYHYqlIeAmyQEC3Up6aF/AUhymh2jGUKWtvo4lsaIvXWSzis6T2qdOJXrr1KHKUYCQ==}
     engines: {node: '>=18.0.0'}
 
   '@humanwhocodes/config-array@0.13.0':
@@ -1692,7 +1692,7 @@ snapshots:
       '@fastify/forwarded': 3.0.1
       ipaddr.js: 2.2.0
 
-  '@fire-shield/core@2.0.6': {}
+  '@fire-shield/core@2.0.8': {}
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
