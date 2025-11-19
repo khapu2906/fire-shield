@@ -35,6 +35,7 @@ export interface RBACContext {
 	user?: RBACUser;
 	resource?: string;
 	action?: string;
+	permission?: string; // Added for direct permission checks in middleware context
 }
 
 /**
@@ -44,4 +45,12 @@ export interface AuthorizationResult {
 	allowed: boolean;
 	reason?: string;
 	user?: RBACUser;
+}
+
+/**
+ * Middleware Context for authorization checks, including request and response objects
+ */
+export interface MiddlewareContext extends RBACContext {
+  request: any; // FastifyRequest or similar
+  response: any; // FastifyReply or similar
 }

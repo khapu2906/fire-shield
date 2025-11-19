@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/core",
-  "version": "2.0.6",
+  "version": "2.0.8",
   "description": "Fire Shield - A powerful, flexible RBAC (Role-Based Access Control) library with lightning-fast bit-based permissions, wildcards, audit logging, and zero dependencies",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,7 +37,7 @@
     "bit-based",
     "typescript"
   ],
-  "author": "Fire Shield Team",
+  "author": "Developers in Black (DIB)",
   "repository": {
     "type": "git",
     "url": "https://github.com/khapu2906/fire-shield.git",

@@ -19,6 +19,8 @@ Complete API documentation for RBAC library.
 
 ---
 
+It's important to note the distinction between internal and public-facing classes for managing permissions and roles. While the codebase contains `PermissionManager` and `RoleManager` as internal components, the primary public interfaces for these functionalities are `BitPermissionManager` (for low-level bit-based permission management) and `RoleHierarchy` (for role hierarchy management). The main `RBAC` class provides methods to access these public-facing managers.
+
 ## RBAC Class
 
 Main class for managing role-based access control.
