@@ -1,0 +1,49 @@
+{
+  "name": "@fire-shield/fastify",
+  "version": "2.0.0",
+  "description": "Fastify adapter for RBAC authorization hooks",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "eslint lib/**/*.ts",
+    "lint:fix": "eslint lib/**/*.ts --fix"
+  },
+  "keywords": [
+    "rbac",
+    "fastify",
+    "hooks",
+    "authorization",
+    "permissions"
+  ],
+  "author": "Fire Shield Team",
+  "license": "DIB",
+  "peerDependencies": {
+    "fastify": "^5.6.2"
+  },
+  "dependencies": {
+    "@fire-shield/core": "^2.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "fastify": "^5.6.2",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
