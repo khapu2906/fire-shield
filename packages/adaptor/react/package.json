@@ -1,0 +1,41 @@
+{
+  "name": "@fire-shield/react",
+  "version": "2.0.0",
+  "description": "React adapter for RBAC with hooks, components, and route guards",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run --environment happy-dom --globals",
+    "test:watch": "vitest --environment happy-dom --globals"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": ["rbac", "react", "hooks", "guards", "authorization", "react-router"],
+  "author": "Fire Shield Team",
+  "license": "DIB",
+  "dependencies": {
+    "@fire-shield/core": "^2.0.8"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "happy-dom": "^12.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-router-dom": {
+      "optional": true
+    }
+  }
+}
