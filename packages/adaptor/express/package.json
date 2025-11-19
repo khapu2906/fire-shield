@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/express",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "Fire Shield Express.js adapter - Lightning-fast RBAC middleware for Express",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,12 +37,12 @@
   "license": "DIB",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fire-shield/fire-shield.git",
-    "directory": "packages/express"
+    "url": "https://github.com/khapu2906/fire-shield.git",
+    "directory": "packages/adaptor/express"
   },
-  "homepage": "https://github.com/fire-shield/fire-shield#readme",
+  "homepage": "https://github.com/khapu2906/fire-shield#readme",
   "bugs": {
-    "url": "https://github.com/fire-shield/fire-shield/issues"
+    "url": "https://github.com/khapu2906/fire-shield/issues"
   },
   "peerDependencies": {
     "express": "^4.0.0"
