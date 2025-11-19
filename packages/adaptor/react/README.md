@@ -416,7 +416,7 @@ DIB © Fire Shield Team
 
 ## Links
 
-- [Fire Shield Core](https://github.com/fire-shield/fire-shield/tree/main/packages/core)
+- [Fire Shield Core](https://github.com/khapu2906/fire-shield/tree/main/packages/core)
 - [React Documentation](https://react.dev)
 - [React Router Documentation](https://reactrouter.com) (for ProtectedRoute)
 - [NPM](https://www.npmjs.com/package/@fire-shield/react)
