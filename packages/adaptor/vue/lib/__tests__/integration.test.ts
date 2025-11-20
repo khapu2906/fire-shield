@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { defineComponent, h, createApp, ref } from 'vue';
+import { defineComponent, createApp, ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { RBAC } from '@fire-shield/core';
 import {
@@ -16,7 +16,6 @@ import {
 
 describe('Vue RBAC Integration Tests', () => {
   let rbac: RBAC;
-  let app: ReturnType<typeof createApp>;
   let router: ReturnType<typeof createRouter>;
 
   beforeEach(() => {
@@ -66,10 +65,10 @@ describe('Vue RBAC Integration Tests', () => {
         const readButton = wrapper.find('[data-test="read-button"]');
 
         // Viewer can't write, should be hidden
-        expect(writeButton.element.style.display).toBe('none');
+        expect((writeButton.element as HTMLElement).style.display).toBe('none');
 
         // Viewer can read, should be visible
-        expect(readButton.element.style.display).not.toBe('none');
+        expect((readButton.element as HTMLElement).style.display).not.toBe('none');
       });
 
       it('should reactively update when user changes', async () => {
@@ -100,7 +99,7 @@ describe('Vue RBAC Integration Tests', () => {
         const writeButton = wrapper.find('[data-test="write-button"]');
 
         // Initially viewer can't write
-        expect(writeButton.element.style.display).toBe('none');
+        expect((writeButton.element as HTMLElement).style.display).toBe('none');
 
         // Change user to editor
         user.value = { id: 'user-1', roles: ['editor'] };
@@ -108,7 +107,7 @@ describe('Vue RBAC Integration Tests', () => {
         await wrapper.vm.$nextTick();
 
         // Now editor can write - should be visible
-        expect(writeButton.element.style.display).not.toBe('none');
+        expect((writeButton.element as HTMLElement).style.display).not.toBe('none');
       });
     });
 
@@ -143,10 +142,10 @@ describe('Vue RBAC Integration Tests', () => {
         const cannotRead = wrapper.find('[data-test="cannot-read"]');
 
         // Viewer can't write, message should show
-        expect(cannotWrite.element.style.display).not.toBe('none');
+        expect((cannotWrite.element as HTMLElement).style.display).not.toBe('none');
 
         // Viewer can read, message should hide
-        expect(cannotRead.element.style.display).toBe('none');
+        expect((cannotRead.element as HTMLElement).style.display).toBe('none');
       });
     });
 
@@ -179,7 +178,7 @@ describe('Vue RBAC Integration Tests', () => {
         const deleteButton = wrapper.find('[data-test="delete-button"]');
 
         // Admin has user:* so should have user:delete
-        expect(deleteButton.element.style.display).not.toBe('none');
+        expect((deleteButton.element as HTMLElement).style.display).not.toBe('none');
       });
     });
 
@@ -214,8 +213,8 @@ describe('Vue RBAC Integration Tests', () => {
         const editorPanel = wrapper.find('[data-test="editor-panel"]');
 
         // User is editor, not admin
-        expect(adminPanel.element.style.display).toBe('none');
-        expect(editorPanel.element.style.display).not.toBe('none');
+        expect((adminPanel.element as HTMLElement).style.display).toBe('none');
+        expect((editorPanel.element as HTMLElement).style.display).not.toBe('none');
       });
     });
   });
