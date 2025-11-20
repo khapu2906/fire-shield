@@ -1,0 +1,93 @@
+import { createApp, ref } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import { RBAC, BufferedAuditLogger, type AuditEvent } from '@fire-shield/core';
+import { createVueRouterRBAC } from '@fire-shield/vue';
+import App from './App.vue';
+import HomePage from './pages/HomePage.vue';
+import PostsPage from './pages/PostsPage.vue';
+import AdminPage from './pages/AdminPage.vue';
+import SettingsPage from './pages/SettingsPage.vue';
+import ActivityPage from './pages/ActivityPage.vue';
+import UnauthorizedPage from './pages/UnauthorizedPage.vue';
+import './style.css';
+
+// Audit logger to track RBAC actions
+const auditLogsArray: AuditEvent[] = [];
+const auditLogger = new BufferedAuditLogger(
+  async (logs) => {
+    auditLogsArray.push(...logs);
+  },
+  { maxBufferSize: 10, flushIntervalMs: 1000 }
+);
+
+// Initialize RBAC with audit logging
+const rbac = new RBAC({ auditLogger });
+rbac.createRole('admin', ['user:*', 'post:*', 'settings:*', 'analytics:*']);
+rbac.createRole('editor', ['post:read', 'post:write', 'post:publish', 'analytics:read']);
+rbac.createRole('viewer', ['post:read', 'analytics:read']);
+rbac.createRole('moderator', ['post:read', 'post:moderate', 'user:read']);
+
+// Create reactive user state
+const currentUser = ref(null);
+const auditLogs = ref<AuditEvent[]>([]);
+
+// Create router
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/',
+      component: HomePage,
+    },
+    {
+      path: '/posts',
+      component: PostsPage,
+      meta: { permission: 'post:read' },
+    },
+    {
+      path: '/admin',
+      component: AdminPage,
+      meta: { role: 'admin' },
+    },
+    {
+      path: '/settings',
+      component: SettingsPage,
+      meta: { permission: 'settings:write' },
+    },
+    {
+      path: '/activity',
+      component: ActivityPage,
+    },
+    {
+      path: '/unauthorized',
+      component: UnauthorizedPage,
+    },
+  ],
+});
+
+// Create app
+const app = createApp(App);
+
+// Install Vue Router RBAC plugin
+const { install: installRBAC, updateUser } = createVueRouterRBAC(router, {
+  rbac,
+  getUser: () => currentUser.value,
+  onUnauthorized: () => {
+    router.push('/unauthorized');
+  },
+  enableGuards: true,
+});
+
+// Provide to all components
+app.provide('currentUser', currentUser);
+app.provide('updateUser', updateUser);
+app.provide('rbac', rbac);
+app.provide('auditLogs', auditLogs);
+app.provide('getAuditLogs', () => {
+  auditLogs.value = [...auditLogsArray].reverse().slice(0, 20);
+});
+
+app.use(router);
+app.use(installRBAC);
+
+app.mount('#app');
