@@ -9,6 +9,40 @@ export default defineConfig({
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Fire Shield - Type-safe RBAC Library' }],
     ['meta', { property: 'og:description', content: 'Fast, flexible, and framework-agnostic RBAC library for JavaScript/TypeScript' }],
+    ['script', { type: 'application/ld+json' }, JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Fire Shield",
+      "description": "Lightning-fast, zero-dependency RBAC library for TypeScript/JavaScript with 125 million permission checks per second",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Cross-platform",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Kent Phung",
+        "url": "https://github.com/khapu2906",
+        "image": "https://avatars.githubusercontent.com/u/54315708?s=400&u=6b78bbeee2f48624a2dc57dfc0a082af5758611c&v=4",
+        "sameAs": [
+          "https://github.com/khapu2906",
+          "https://www.linkedin.com/in/kent-phung-9a5400220/",
+          "https://www.facebook.com/d.kha.pu",
+          "https://buymeacoffee.com/kentphung92",
+          "https://kentphung.online/vi/",
+          "https://x.com/kent_phung2906"
+        ],
+        "jobTitle": "As a software engineer with 10 + years of experience, specializing in TypeScript, Golang, Php, AI, Auth, security security systems, Cloud solutions, Computer Vision, and high- performance libraries.Creator of Fire Shield RBAC library",
+        "description": "Full-stack developer specializing in TypeScript, security systems, and high-performance libraries. Creator of Fire Shield RBAC library."
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+      }
+    })],
   ],
 
   themeConfig: {
