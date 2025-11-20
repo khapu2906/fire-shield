@@ -23,9 +23,13 @@
 		"@changesets/cli": "^2.26.0",
 		"@typescript-eslint/eslint-plugin": "^8.18.1",
 		"@typescript-eslint/parser": "^8.18.1",
+		"@vue/test-utils": "^2.4.6",
 		"eslint": "^8.0.0",
+		"happy-dom": "^12.10.3",
+		"jsdom": "^27.2.0",
 		"turbo": "^2.6.1",
-		"typescript": "^5.0.0"
+		"typescript": "^5.0.0",
+		"vue-router": "^4.6.3"
 	},
 	"packageManager": "npm@9.0.0",
 	"engines": {

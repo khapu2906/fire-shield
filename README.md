@@ -27,7 +27,7 @@ const admin = { id: '1', roles: ['admin'] };
 rbac.hasPermission(admin, 'user:delete'); // true ✓
 ```
 
-[**Full Documentation →**](./core/README.md)
+[**Full Documentation →**](./packages/core/README.md)
 
 ---
 
@@ -35,12 +35,13 @@ rbac.hasPermission(admin, 'user:delete'); // true ✓
 
 ### ⚡ Fastest RBAC Library
 
-| Library | Performance |
-|---------|-------------|
-| **Fire Shield** | **125M ops/sec** 🏆 |
-| CASL | 2M ops/sec |
-| AccessControl | 1M ops/sec |
-| Casbin | 476K ops/sec |
+| Library | Performance | Downloads/month | Stars |
+|---------|-------------|----------------|-------|
+| **Fire Shield** | **125M ops/sec** 🏆 | - | - |
+| CASL | 2M ops/sec | 2.5M | 6.7K |
+| AccessControl | 1M ops/sec | 266K | 2.3K |
+| Casbin | 476K ops/sec | 264K | 2.8K |
+| acl | 769K ops/sec | 16.5K | 2.6K |
 
 **Fire Shield is 15-260x faster than alternatives!**
 
@@ -48,8 +49,10 @@ rbac.hasPermission(admin, 'user:delete'); // true ✓
 
 ```
 Fire Shield:     15 KB ✅
-CASL:            45 KB
-Casbin:         120 KB ❌
+acl:             35 KB
+AccessControl:  184 KB
+CASL:           356 KB
+Casbin:         633 KB ❌
 ```
 
 ### ✨ Most Features
@@ -59,6 +62,7 @@ Casbin:         120 KB ❌
 - ✅ **Audit Logging** - Built-in compliance & security logging
 - ✅ **Deny Permissions** - Explicit denials override allows
 - ✅ **Role Hierarchy** - Level-based role inheritance
+- ✅ **Strict Mode** - Configurable error handling for invalid operations
 - ✅ **Zero Dependencies** - No supply chain risks
 - ✅ **TypeScript First** - 100% type-safe
 - ✅ **Framework Agnostic** - Works everywhere
@@ -71,10 +75,72 @@ This is a monorepo containing:
 
 | Package | Description | Version |
 |---------|-------------|---------|
-| **[@fire-shield/core](./core)** | Core RBAC library | [![npm](https://img.shields.io/npm/v/@fire-shield/core)](https://www.npmjs.com/package/@fire-shield/core) |
-| **@fire-shield/express** | Express.js middleware | Coming soon |
-| **@fire-shield/react** | React hooks & components | Coming soon |
-| **@fire-shield/nextjs** | Next.js integration | Coming soon |
+| **[@fire-shield/core](./packages/core)** | Core RBAC library | [![npm](https://img.shields.io/npm/v/@fire-shield/core)](https://www.npmjs.com/package/@fire-shield/core) |
+| **[@fire-shield/express](./packages/adaptor/express)** | Express.js middleware | [![npm](https://img.shields.io/npm/v/@fire-shield/express)](https://www.npmjs.com/package/@fire-shield/express) |
+| **[@fire-shield/react](./packages/adaptor/react)** | React hooks & components | [![npm](https://img.shields.io/npm/v/@fire-shield/react)](https://www.npmjs.com/package/@fire-shield/react) |
+| **[@fire-shield/vue](./packages/adaptor/vue)** | Vue.js composables & components | [![npm](https://img.shields.io/npm/v/@fire-shield/vue)](https://www.npmjs.com/package/@fire-shield/vue) |
+| **[@fire-shield/angular](./packages/adaptor/angular)** | Angular guards & directives | [![npm](https://img.shields.io/npm/v/@fire-shield/angular)](https://www.npmjs.com/package/@fire-shield/angular) |
+| **[@fire-shield/next](./packages/adaptor/next)** | Next.js middleware | [![npm](https://img.shields.io/npm/v/@fire-shield/next)](https://www.npmjs.com/package/@fire-shield/next) |
+| **[@fire-shield/nuxt](./packages/adaptor/nuxt)** | Nuxt.js module | [![npm](https://img.shields.io/npm/v/@fire-shield/nuxt)](https://www.npmjs.com/package/@fire-shield/nuxt) |
+| **[@fire-shield/svelte](./packages/adaptor/svelte)** | Svelte stores & actions | [![npm](https://img.shields.io/npm/v/@fire-shield/svelte)](https://www.npmjs.com/package/@fire-shield/svelte) |
+| **[@fire-shield/fastify](./packages/adaptor/fastify)** | Fastify plugin | [![npm](https://img.shields.io/npm/v/@fire-shield/fastify)](https://www.npmjs.com/package/@fire-shield/fastify) |
+| **[@fire-shield/hono](./packages/adaptor/hono)** | Hono middleware | [![npm](https://img.shields.io/npm/v/@fire-shield/hono)](https://www.npmjs.com/package/@fire-shield/hono) |
+
+---
+
+## 🔧 Framework Adaptors
+
+Fire Shield provides ready-to-use adaptors for popular frameworks:
+
+### Express.js
+```typescript
+import { RBAC } from '@fire-shield/core';
+import { rbacMiddleware } from '@fire-shield/express';
+
+const rbac = new RBAC();
+rbac.createRole('admin', ['user:*']);
+
+app.use(rbacMiddleware(rbac));
+```
+
+### React
+```typescript
+import { RBACProvider, usePermission } from '@fire-shield/react';
+
+function MyComponent() {
+  const canEdit = usePermission('user:edit');
+
+  return canEdit ? <EditButton /> : null;
+}
+```
+
+### Vue.js
+```typescript
+import { createRBAC } from '@fire-shield/vue';
+
+const { rbac, usePermission } = createRBAC();
+```
+
+### Angular
+```typescript
+import { CanActivate } from '@fire-shield/angular';
+
+@Injectable()
+export class AdminGuard implements CanActivate {
+  constructor(private rbac: RBACService) {}
+
+  canActivate(): boolean {
+    return this.rbac.hasPermission('admin:access');
+  }
+}
+```
+
+### Next.js
+```typescript
+import { withRBAC } from '@fire-shield/next';
+
+export default withRBAC(MyPage, { requiredPermission: 'page:view' });
+```
 
 ---
 
@@ -143,15 +209,15 @@ rbac.hasPermission(user, 'read'); // true (0.000008ms)
 
 ## 📚 Documentation
 
-- **[Getting Started](./core/docs/GETTING_STARTED.md)** - Installation & quick start
-- **[API Reference](./core/docs/API_REFERENCE.md)** - Complete API documentation
-- **[Core Concepts](./core/docs/CORE_CONCEPTS.md)** - Understanding Fire Shield
-- **[Advanced Features](./core/docs/ADVANCED_FEATURES.md)** - Wildcards, Audit, Deny
-- **[Best Practices](./core/docs/BEST_PRACTICES.md)** - Recommended patterns
-- **[Examples](./core/docs/EXAMPLES.md)** - Real-world use cases
-- **[Performance Guide](./core/docs/PERFORMANCE.md)** - Optimization tips
-- **[Migration Guide](./core/docs/MIGRATION_GUIDE.md)** - Upgrading guide
-- **[Comparison](./core/docs/COMPARISON.md)** - vs other RBAC libraries
+- **[Getting Started](./packages/core/docs/GETTING_STARTED.md)** - Installation & quick start
+- **[API Reference](./packages/core/docs/API_REFERENCE.md)** - Complete API documentation
+- **[Core Concepts](./packages/core/docs/CORE_CONCEPTS.md)** - Understanding Fire Shield
+- **[Advanced Features](./packages/core/docs/ADVANCED_FEATURES.md)** - Wildcards, Audit, Deny
+- **[Best Practices](./packages/core/docs/BEST_PRACTICES.md)** - Recommended patterns
+- **[Examples](./packages/core/docs/EXAMPLES.md)** - Real-world use cases
+- **[Performance Guide](./packages/core/docs/PERFORMANCE.md)** - Optimization tips
+- **[Migration Guide](./packages/core/docs/MIGRATION_GUIDE.md)** - Upgrading guide
+- **[Comparison](./packages/core/docs/COMPARISON.md)** - vs other RBAC libraries
 
 ---
 
@@ -196,7 +262,16 @@ rbac.hasPermission(user, 'tenant:abc:users:read'); // true
 rbac.hasPermission(user, 'tenant:xyz:users:read'); // false
 ```
 
-[**More Examples →**](./core/docs/EXAMPLES.md)
+[**More Examples →**](./packages/core/docs/EXAMPLES.md)
+
+---
+
+### 🚀 Live Demos
+
+Try Fire Shield in action:
+
+- **[React Demo](https://fire-shield-example-react.vercel.app/)** - Interactive RBAC demo with React
+- **[Vue Demo](https://fire-shield-example-vue.vercel.app/)** - Interactive RBAC demo with Vue.js
 
 ---
 
@@ -216,18 +291,20 @@ Fire Shield is perfect for:
 
 ## 🆚 Comparison
 
-| Feature | Fire Shield | Casbin | CASL | AccessControl |
-|---------|------------|--------|------|---------------|
-| **Performance** | 125M ops/sec ⚡ | 476K | 2M | 1M |
-| **Bundle Size** | 15KB | 120KB | 45KB | 28KB |
-| **Wildcards** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Audit Logging** | ✅ Built-in | 🟡 Plugin | ❌ No | ❌ No |
-| **Deny Permissions** | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **TypeScript** | ✅ Native | ✅ Yes | ✅ Yes | 🟡 Partial |
-| **Dependencies** | 0 ✅ | 10+ | 5 | 3 |
-| **Maintained** | ✅ Active | ✅ Active | ✅ Active | ❌ 2021 |
+| Feature | Fire Shield | Casbin | CASL | AccessControl | acl |
+|---------|------------|--------|------|---------------|-----|
+| **Performance** | 125M ops/sec ⚡ | 476K | 2M | 1M | 769K |
+| **Bundle Size** | 15KB | 633KB | 356KB | 184KB | 35KB |
+| **Downloads/month** | - | 264K | 2.5M | 266K | 16.5K |
+| **Stars** | - | 2.8K | 6.7K | 2.3K | 2.6K |
+| **Wildcards** | ✅ Yes | ✅ Yes (regex) | ✅ Yes | ✅ Yes | ❌ No |
+| **Audit Logging** | ✅ Built-in | 🟡 Plugin | ❌ No | ❌ No | ❌ No |
+| **Deny Permissions** | ✅ Yes | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **TypeScript** | ✅ Native | ✅ Full | ✅ Full | 🟡 Partial | 🟡 Partial |
+| **Dependencies** | 0 ✅ | 10+ | 5 | 3 | 5 |
+| **Maintained** | ✅ Active | ✅ Active | ✅ Active | ❌ 8 years ago | ❌ Oct 2019 |
 
-[**Detailed Comparison →**](./core/docs/COMPARISON.md)
+[**Detailed Comparison →**](./packages/core/docs/COMPARISON.md)
 
 ---
 
@@ -265,7 +342,7 @@ Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.m
 
 - **NPM:** [@fire-shield/core](https://www.npmjs.com/package/@fire-shield/core)
 - **GitHub:** [github.com/khapu2906/fire-shield](https://github.com/khapu2906/fire-shield)
-- **Documentation:** [Full Docs](./core/README.md)
+- **Documentation:** [Full Docs](./packages/core/README.md)
 - **Issues:** [Report a bug](https://github.com/khapu2906/fire-shield/issues)
 
 ---

@@ -1,27 +1,33 @@
+<script setup lang="ts">
+import { ProtectedRoute } from '@fire-shield/vue';
+</script>
+
 <template>
-  <div>
-    <h2>Admin Dashboard</h2>
-    <p>This page is protected and requires 'admin' role.</p>
+  <ProtectedRoute role="admin" redirectTo="/unauthorized">
+    <div>
+      <h2>Admin Dashboard</h2>
+      <p>This page is protected and requires 'admin' role.</p>
 
-    <div class="stats-grid">
-      <div class="stat-card blue">
-        <h3>Users</h3>
-        <p class="stat-number">156</p>
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <h3>Users</h3>
+          <p class="stat-number">156</p>
+        </div>
+        <div class="stat-card green">
+          <h3>Posts</h3>
+          <p class="stat-number">432</p>
+        </div>
+        <div class="stat-card red">
+          <h3>Settings</h3>
+          <p class="stat-number">12</p>
+        </div>
       </div>
-      <div class="stat-card green">
-        <h3>Posts</h3>
-        <p class="stat-number">432</p>
-      </div>
-      <div class="stat-card red">
-        <h3>Settings</h3>
-        <p class="stat-number">12</p>
+
+      <div class="admin-note">
+        <strong>Admin Note:</strong> Only users with the 'admin' role can access this page.
       </div>
     </div>
-
-    <div class="admin-note">
-      <strong>Admin Note:</strong> Only users with the 'admin' role can access this page.
-    </div>
-  </div>
+  </ProtectedRoute>
 </template>
 
 <style scoped>

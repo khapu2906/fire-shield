@@ -65,17 +65,36 @@ const router = createRouter({
   ],
 });
 
-// Create app
+router.onError((error) => {
+  console.error('❌ Router error:', error);
+});
+
+// Create app with error handler
 const app = createApp(App);
+
+// Add global error handler
+app.config.errorHandler = (err, instance, info) => {
+  console.error('❌ Vue Error:', err);
+  console.error('Component:', instance);
+  console.error('Info:', info);
+
+  const loading = document.getElementById('loading');
+  if (loading) {
+    loading.innerHTML = `<p style="color: red;">❌ Vue Component Error</p><pre style="text-align: left; font-size: 12px; max-width: 600px; margin: 20px auto; background: #fee; padding: 10px; border-radius: 4px;">${err}\n\nInfo: ${info}</pre>`;
+  }
+};
 
 // Install Vue Router RBAC plugin
 const { install: installRBAC, updateUser } = createVueRouterRBAC(router, {
   rbac,
   getUser: () => currentUser.value,
-  onUnauthorized: () => {
-    router.push('/unauthorized');
+  onUnauthorized: (to) => {
+    // Prevent infinite loop - don't redirect if already on unauthorized or home page
+    if (to.path !== '/unauthorized' && to.path !== '/') {
+      router.push('/unauthorized');
+    }
   },
-  enableGuards: true,
+  enableGuards: false, // Use component-level protection instead of global guards
 });
 
 // Provide to all components
@@ -90,4 +109,20 @@ app.provide('getAuditLogs', () => {
 app.use(router);
 app.use(installRBAC);
 
-app.mount('#app');
+try {
+  app.mount('#app');
+
+  // Hide loading indicator
+  const loading = document.getElementById('loading');
+  if (loading) {
+    loading.remove();
+  }
+} catch (error) {
+  console.error('❌ Failed to mount app:', error);
+
+  // Show error in loading indicator
+  const loading = document.getElementById('loading');
+  if (loading) {
+    loading.innerHTML = `<p style="color: red;">❌ App failed to mount</p><pre style="text-align: left; font-size: 12px; max-width: 600px; margin: 20px auto;">${error}</pre>`;
+  }
+}

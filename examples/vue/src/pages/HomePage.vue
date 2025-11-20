@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject, onMounted, onUnmounted } from 'vue';
-import { useCan, useRole, useAuthorize } from '@fire-shield/vue';
+import { inject, onMounted, onUnmounted, computed } from 'vue';
+import { useCan, useRole, useAuthorize, Cannot } from '@fire-shield/vue';
 
 const getAuditLogs = inject<() => void>('getAuditLogs')!;
 
@@ -10,6 +10,7 @@ const isModerator = useRole('moderator');
 const postWrite = useAuthorize('post:write');
 const canReadPosts = useCan('post:read');
 const canReadAnalytics = useCan('analytics:read');
+const canWritePosts = useCan('post:write');
 
 let interval: number;
 
@@ -21,8 +22,8 @@ onUnmounted(() => {
   if (interval) clearInterval(interval);
 });
 
-const hasMultiplePerms = useCan('post:read') && useCan('post:write');
-const hasAnyPerm = canReadPosts || canReadAnalytics;
+const hasMultiplePerms = computed(() => canReadPosts.value && canWritePosts.value);
+const hasAnyPerm = computed(() => canReadPosts.value || canReadAnalytics.value);
 </script>
 
 <template>
@@ -47,12 +48,12 @@ const hasAnyPerm = canReadPosts || canReadAnalytics;
           <div class="text-sm text-purple-700">Get detailed authorization</div>
         </div>
         <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
-          <div class="font-semibold text-orange-900 mb-1">v-can</div>
-          <div class="text-sm text-orange-700">Conditional directive</div>
+          <div class="font-semibold text-orange-900 mb-1">&lt;Can&gt;</div>
+          <div class="text-sm text-orange-700">Conditional component</div>
         </div>
         <div class="p-4 bg-pink-50 rounded-lg border border-pink-200">
-          <div class="font-semibold text-pink-900 mb-1">v-cannot</div>
-          <div class="text-sm text-pink-700">Inverse directive</div>
+          <div class="font-semibold text-pink-900 mb-1">&lt;Cannot&gt;</div>
+          <div class="text-sm text-pink-700">Inverse component</div>
         </div>
         <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
           <div class="font-semibold text-indigo-900 mb-1">Route Guards</div>
@@ -128,11 +129,13 @@ const hasAnyPerm = canReadPosts || canReadAnalytics;
             <p class="text-sm opacity-90">Can moderate posts and view users</p>
           </div>
 
-          <div v-cannot="'post:write'" class="p-4 bg-gray-100 text-gray-700 rounded-lg">
-            <p class="text-sm">
-              💡 Switch to <strong>editor</strong> or <strong>admin</strong> role to create posts
-            </p>
-          </div>
+          <Cannot permission="post:write">
+            <div class="p-4 bg-gray-100 text-gray-700 rounded-lg">
+              <p class="text-sm">
+                💡 Switch to <strong>editor</strong> or <strong>admin</strong> role to create posts
+              </p>
+            </div>
+          </Cannot>
         </div>
       </div>
     </div>

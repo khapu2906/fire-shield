@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, inject, computed, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useCan, useRole } from '@fire-shield/vue';
+import { useCan, useRole, Can, Cannot } from '@fire-shield/vue';
 import type { RBACUser } from '@fire-shield/core';
 
 // Mock users
@@ -85,16 +85,17 @@ function switchRole(role: UserRole) {
             Home
           </router-link>
 
-          <router-link
-            v-can="'post:read'"
-            to="/posts"
-            :class="[
-              'font-medium transition-colors',
-              isActive('/posts') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-            ]"
-          >
-            Posts
-          </router-link>
+          <Can permission="post:read">
+            <router-link
+              to="/posts"
+              :class="[
+                'font-medium transition-colors',
+                isActive('/posts') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+              ]"
+            >
+              Posts
+            </router-link>
+          </Can>
 
           <router-link
             v-if="canAccessAdmin"
@@ -128,9 +129,11 @@ function switchRole(role: UserRole) {
             Activity
           </router-link>
 
-          <span v-cannot="'post:read'" class="text-gray-400 cursor-not-allowed">
-            Posts (No Access)
-          </span>
+          <Cannot permission="post:read">
+            <span class="text-gray-400 cursor-not-allowed">
+              Posts (No Access)
+            </span>
+          </Cannot>
         </nav>
 
         <!-- User Info Bar -->

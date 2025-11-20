@@ -4,9 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fire Shield Vue Example</title>
+    <style>
+      #loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Loading Fire Shield...</p>
+    </div>
+    <div id="app" style="background: white; min-height: 100vh;"></div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      // Remove loading after 5 seconds if app hasn't mounted
+      setTimeout(() => {
+        const loading = document.getElementById('loading');
+        if (loading && loading.style.display !== 'none') {
+          loading.innerHTML = '<p style="color: red;">❌ App failed to load. Check console for errors.</p>';
+        }
+      }, 5000);
+    </script>
   </body>
 </html>
