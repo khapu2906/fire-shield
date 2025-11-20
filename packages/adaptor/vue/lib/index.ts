@@ -1,5 +1,5 @@
 import type { App, Directive, ComputedRef } from 'vue';
-import { computed, inject, ref, type Ref } from 'vue';
+import { computed, inject, ref, type Ref, getCurrentInstance, watchEffect } from 'vue';
 import type { Router, RouteLocationNormalized, NavigationGuardNext } from 'vue-router';
 import { RBAC, type RBACUser, type AuthorizationResult } from '@fire-shield/core';
 
@@ -175,9 +175,15 @@ export function useAnyPermission(...permissions: string[]): ComputedRef<boolean>
  * Usage: v-permission="'posts:read'"
  */
 const permissionDirective: Directive<HTMLElement, string> = {
-  mounted(el, binding) {
-    const rbac = inject<RBAC>(RBACSymbol);
-    const user = inject<Ref<RBACUser | null>>(UserSymbol);
+  mounted(el, binding, vnode) {
+    const instance = vnode.appContext;
+    if (!instance) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const rbac = instance.config.globalProperties.$rbac as RBAC;
+    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!rbac || !user) {
       el.style.display = 'none';
@@ -192,16 +198,18 @@ const permissionDirective: Directive<HTMLElement, string> = {
     // Initial check
     checkPermission();
 
-    // Watch for user changes (simplified - in production use watchEffect)
-    (el as any)._permissionCheck = checkPermission;
-  },
-  updated(el, binding) {
-    if ((el as any)._permissionCheck) {
-      (el as any)._permissionCheck();
-    }
+    // Watch for user changes using watchEffect
+    const stopWatch = watchEffect(checkPermission);
+
+    // Store cleanup function
+    (el as any)._permissionCleanup = stopWatch;
   },
   unmounted(el) {
-    delete (el as any)._permissionCheck;
+    // Cleanup watcher
+    if ((el as any)._permissionCleanup) {
+      (el as any)._permissionCleanup();
+      delete (el as any)._permissionCleanup;
+    }
   }
 };
 
@@ -210,8 +218,14 @@ const permissionDirective: Directive<HTMLElement, string> = {
  * Usage: v-role="'admin'"
  */
 const roleDirective: Directive<HTMLElement, string> = {
-  mounted(el, binding) {
-    const user = inject<Ref<RBACUser | null>>(UserSymbol);
+  mounted(el, binding, vnode) {
+    const instance = vnode.appContext;
+    if (!instance) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!user) {
       el.style.display = 'none';
@@ -226,16 +240,18 @@ const roleDirective: Directive<HTMLElement, string> = {
     // Initial check
     checkRole();
 
-    // Watch for user changes
-    (el as any)._roleCheck = checkRole;
-  },
-  updated(el,) {
-    if ((el as any)._roleCheck) {
-      (el as any)._roleCheck();
-    }
+    // Watch for user changes using watchEffect
+    const stopWatch = watchEffect(checkRole);
+
+    // Store cleanup function
+    (el as any)._roleCleanup = stopWatch;
   },
   unmounted(el) {
-    delete (el as any)._roleCheck;
+    // Cleanup watcher
+    if ((el as any)._roleCleanup) {
+      (el as any)._roleCleanup();
+      delete (el as any)._roleCleanup;
+    }
   }
 };
 
@@ -244,9 +260,15 @@ const roleDirective: Directive<HTMLElement, string> = {
  * Usage: v-can="'posts:read'"
  */
 const canDirective: Directive<HTMLElement, string> = {
-  mounted(el, binding) {
-    const rbac = inject<RBAC>(RBACSymbol);
-    const user = inject<Ref<RBACUser | null>>(UserSymbol);
+  mounted(el, binding, vnode) {
+    const instance = vnode.appContext;
+    if (!instance) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const rbac = instance.config.globalProperties.$rbac as RBAC;
+    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!rbac || !user) {
       el.style.display = 'none';
@@ -261,16 +283,18 @@ const canDirective: Directive<HTMLElement, string> = {
     // Initial check
     checkPermission();
 
-    // Watch for user changes (simplified - in production use watchEffect)
-    (el as any)._canCheck = checkPermission;
-  },
-  updated(el, binding) {
-    if ((el as any)._canCheck) {
-      (el as any)._canCheck();
-    }
+    // Watch for user changes using watchEffect
+    const stopWatch = watchEffect(checkPermission);
+
+    // Store cleanup function
+    (el as any)._canCleanup = stopWatch;
   },
   unmounted(el) {
-    delete (el as any)._canCheck;
+    // Cleanup watcher
+    if ((el as any)._canCleanup) {
+      (el as any)._canCleanup();
+      delete (el as any)._canCleanup;
+    }
   }
 };
 
@@ -279,9 +303,15 @@ const canDirective: Directive<HTMLElement, string> = {
  * Usage: v-cannot="'posts:delete'"
  */
 const cannotDirective: Directive<HTMLElement, string> = {
-  mounted(el, binding) {
-    const rbac = inject<RBAC>(RBACSymbol);
-    const user = inject<Ref<RBACUser | null>>(UserSymbol);
+  mounted(el, binding, vnode) {
+    const instance = vnode.appContext;
+    if (!instance) {
+      el.style.display = '';
+      return;
+    }
+
+    const rbac = instance.config.globalProperties.$rbac as RBAC;
+    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!rbac || !user) {
       el.style.display = '';
@@ -296,16 +326,18 @@ const cannotDirective: Directive<HTMLElement, string> = {
     // Initial check
     checkPermission();
 
-    // Watch for user changes
-    (el as any)._cannotCheck = checkPermission;
-  },
-  updated(el, binding) {
-    if ((el as any)._cannotCheck) {
-      (el as any)._cannotCheck();
-    }
+    // Watch for user changes using watchEffect
+    const stopWatch = watchEffect(checkPermission);
+
+    // Store cleanup function
+    (el as any)._cannotCleanup = stopWatch;
   },
   unmounted(el) {
-    delete (el as any)._cannotCheck;
+    // Cleanup watcher
+    if ((el as any)._cannotCleanup) {
+      (el as any)._cannotCleanup();
+      delete (el as any)._cannotCleanup;
+    }
   }
 };
 

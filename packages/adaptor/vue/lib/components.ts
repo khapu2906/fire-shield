@@ -1,5 +1,5 @@
 import { defineComponent, h, type PropType, type VNode, type Component } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, type Router } from 'vue-router';
 import { useCan, useRole, useUser } from './index';
 
 /**
@@ -158,7 +158,16 @@ export const ProtectedRoute = defineComponent({
   },
   setup(props, { slots }) {
     const user = useUser();
-    const router = useRouter();
+    let router: Router | undefined;
+
+    // Try to get router, but don't throw if not available
+    try {
+      router = useRouter();
+    } catch (e) {
+      // Router not available - component may not be inside router-view
+      router = undefined;
+    }
+
     const hasPermission = props.permission ? useCan(props.permission) : { value: true };
     const hasRole = props.role ? useRole(props.role) : { value: true };
 
@@ -167,7 +176,7 @@ export const ProtectedRoute = defineComponent({
 
       // If not allowed and user is not logged in
       if (!allowed || !user.value) {
-        if (props.redirectTo) {
+        if (props.redirectTo && router) {
           router.push(props.redirectTo);
           return null;
         }
