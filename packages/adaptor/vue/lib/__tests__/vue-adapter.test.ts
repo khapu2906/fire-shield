@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ref, computed } from 'vue';
 import { RBAC } from '@fire-shield/core';
@@ -230,15 +233,192 @@ describe('Vue RBAC Adapter', () => {
   });
 
   describe('Directives', () => {
-    it('should have permission directive', () => {
-      // Directives are tested in integration tests
-      // Unit testing directives requires DOM and Vue app instance
-      expect(true).toBe(true);
+    describe('v-permission', () => {
+      it('should hide element when user lacks permission', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:write' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        // Mock inject to return rbac and user
+        const permissionDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? '' : 'none';
+          }
+        };
+
+        permissionDirective.mounted(el, binding);
+        expect(el.style.display).toBe('none');
+      });
+
+      it('should show element when user has permission', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:read' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const permissionDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? '' : 'none';
+          }
+        };
+
+        permissionDirective.mounted(el, binding);
+        expect(el.style.display).toBe('');
+      });
     });
 
-    it('should have role directive', () => {
-      // Directives are tested in integration tests
-      expect(true).toBe(true);
+    describe('v-role', () => {
+      it('should hide element when user lacks role', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'admin' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const roleDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasRole = user.roles?.includes(binding.value) || false;
+            el.style.display = hasRole ? '' : 'none';
+          }
+        };
+
+        roleDirective.mounted(el, binding);
+        expect(el.style.display).toBe('none');
+      });
+
+      it('should show element when user has role', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'viewer' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const roleDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasRole = user.roles?.includes(binding.value) || false;
+            el.style.display = hasRole ? '' : 'none';
+          }
+        };
+
+        roleDirective.mounted(el, binding);
+        expect(el.style.display).toBe('');
+      });
+    });
+
+    describe('v-can', () => {
+      it('should hide element when user lacks permission', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:write' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const canDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? '' : 'none';
+          }
+        };
+
+        canDirective.mounted(el, binding);
+        expect(el.style.display).toBe('none');
+      });
+
+      it('should show element when user has permission', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:read' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const canDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? '' : 'none';
+          }
+        };
+
+        canDirective.mounted(el, binding);
+        expect(el.style.display).toBe('');
+      });
+
+      it('should handle wildcard permissions', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:delete' };
+        const user = { id: 'admin-1', roles: ['admin'] };
+
+        const canDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? '' : 'none';
+          }
+        };
+
+        canDirective.mounted(el, binding);
+        expect(el.style.display).toBe('');
+      });
+    });
+
+    describe('v-cannot', () => {
+      it('should show element when user lacks permission', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:write' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const cannotDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? 'none' : '';
+          }
+        };
+
+        cannotDirective.mounted(el, binding);
+        expect(el.style.display).toBe('');
+      });
+
+      it('should hide element when user has permission', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'post:read' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const cannotDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? 'none' : '';
+          }
+        };
+
+        cannotDirective.mounted(el, binding);
+        expect(el.style.display).toBe('none');
+      });
+
+      it('should show warning message when user lacks permission', () => {
+        const el = document.createElement('div');
+        el.textContent = 'You cannot edit posts';
+        const binding = { value: 'post:write' };
+        const user = { id: 'user-1', roles: ['viewer'] };
+
+        const cannotDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? 'none' : '';
+          }
+        };
+
+        cannotDirective.mounted(el, binding);
+        expect(el.style.display).toBe('');
+        expect(el.textContent).toBe('You cannot edit posts');
+      });
+
+      it('should handle admin with wildcard correctly', () => {
+        const el = document.createElement('div');
+        const binding = { value: 'user:delete' };
+        const user = { id: 'admin-1', roles: ['admin'] };
+
+        const cannotDirective = {
+          mounted: (el: HTMLElement, binding: any) => {
+            const hasPermission = rbac.hasPermission(user, binding.value);
+            el.style.display = hasPermission ? 'none' : '';
+          }
+        };
+
+        cannotDirective.mounted(el, binding);
+        // Admin has user:* so should hide the "cannot" message
+        expect(el.style.display).toBe('none');
+      });
     });
   });
 

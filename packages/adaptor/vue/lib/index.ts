@@ -240,6 +240,76 @@ const roleDirective: Directive<HTMLElement, string> = {
 };
 
 /**
+ * v-can directive (alias for v-permission)
+ * Usage: v-can="'posts:read'"
+ */
+const canDirective: Directive<HTMLElement, string> = {
+  mounted(el, binding) {
+    const rbac = inject<RBAC>(RBACSymbol);
+    const user = inject<Ref<RBACUser | null>>(UserSymbol);
+
+    if (!rbac || !user) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const checkPermission = () => {
+      const hasPermission = user.value && rbac.hasPermission(user.value, binding.value);
+      el.style.display = hasPermission ? '' : 'none';
+    };
+
+    // Initial check
+    checkPermission();
+
+    // Watch for user changes (simplified - in production use watchEffect)
+    (el as any)._canCheck = checkPermission;
+  },
+  updated(el, binding) {
+    if ((el as any)._canCheck) {
+      (el as any)._canCheck();
+    }
+  },
+  unmounted(el) {
+    delete (el as any)._canCheck;
+  }
+};
+
+/**
+ * v-cannot directive (inverse of v-can)
+ * Usage: v-cannot="'posts:delete'"
+ */
+const cannotDirective: Directive<HTMLElement, string> = {
+  mounted(el, binding) {
+    const rbac = inject<RBAC>(RBACSymbol);
+    const user = inject<Ref<RBACUser | null>>(UserSymbol);
+
+    if (!rbac || !user) {
+      el.style.display = '';
+      return;
+    }
+
+    const checkPermission = () => {
+      const hasPermission = user.value && rbac.hasPermission(user.value, binding.value);
+      el.style.display = hasPermission ? 'none' : '';
+    };
+
+    // Initial check
+    checkPermission();
+
+    // Watch for user changes
+    (el as any)._cannotCheck = checkPermission;
+  },
+  updated(el, binding) {
+    if ((el as any)._cannotCheck) {
+      (el as any)._cannotCheck();
+    }
+  },
+  unmounted(el) {
+    delete (el as any)._cannotCheck;
+  }
+};
+
+/**
  * Check route RBAC requirements
  */
 function checkRouteAccess(
@@ -390,6 +460,8 @@ export function createVueRouterRBAC(router: Router, options: VueRouterRBACOption
       // Register directives
       app.directive('permission', permissionDirective);
       app.directive('role', roleDirective);
+      app.directive('can', canDirective);
+      app.directive('cannot', cannotDirective);
 
       // Expose global properties (optional)
       app.config.globalProperties.$rbac = options.rbac;
@@ -409,7 +481,7 @@ export interface CanProps {
 }
 
 // Export components
-export { Can, Cannot, RequirePermission } from './components';
+export { Can, Cannot, RequirePermission, ProtectedRoute } from './components';
 
 // Export route helper
 export { checkRouteAccess };

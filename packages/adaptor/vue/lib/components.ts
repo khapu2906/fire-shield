@@ -1,5 +1,6 @@
-import { defineComponent, h, type PropType, type VNode } from 'vue';
-import { useCan, useRole } from './index';
+import { defineComponent, h, type PropType, type VNode, type Component } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCan, useRole, useUser } from './index';
 
 /**
  * Can Component - Render if user has permission/role
@@ -117,6 +118,68 @@ export const RequirePermission = defineComponent({
         throw new Error(`Permission denied: ${props.permission}`);
       }
 
+      return slots.default ? slots.default() : null;
+    };
+  }
+});
+
+/**
+ * ProtectedRoute Component - Component-level route protection
+ *
+ * Usage:
+ * <ProtectedRoute permission="post:read" fallback={UnauthorizedPage}>
+ *   <PostsPage />
+ * </ProtectedRoute>
+ *
+ * Or with redirect:
+ * <ProtectedRoute role="admin" redirectTo="/">
+ *   <AdminPage />
+ * </ProtectedRoute>
+ */
+export const ProtectedRoute = defineComponent({
+  name: 'ProtectedRoute',
+  props: {
+    permission: {
+      type: String as PropType<string | undefined>,
+      default: undefined
+    },
+    role: {
+      type: String as PropType<string | undefined>,
+      default: undefined
+    },
+    fallback: {
+      type: Object as PropType<Component | undefined>,
+      default: undefined
+    },
+    redirectTo: {
+      type: String as PropType<string | undefined>,
+      default: undefined
+    }
+  },
+  setup(props, { slots }) {
+    const user = useUser();
+    const router = useRouter();
+    const hasPermission = props.permission ? useCan(props.permission) : { value: true };
+    const hasRole = props.role ? useRole(props.role) : { value: true };
+
+    return () => {
+      const allowed = hasPermission.value && hasRole.value;
+
+      // If not allowed and user is not logged in
+      if (!allowed || !user.value) {
+        if (props.redirectTo) {
+          router.push(props.redirectTo);
+          return null;
+        }
+
+        if (props.fallback) {
+          return h(props.fallback);
+        }
+
+        return null;
+      }
+
+      // Allowed - render children
       return slots.default ? slots.default() : null;
     };
   }
