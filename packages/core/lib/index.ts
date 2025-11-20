@@ -654,7 +654,7 @@ export {
   ConsoleAuditLogger,
   BufferedAuditLogger,
   MultiAuditLogger,
-} from './types/audit.types';
+} from './utils/audit-log';
 
 // Export optional presets
 export { defaultPreset } from './presets/default.preset';

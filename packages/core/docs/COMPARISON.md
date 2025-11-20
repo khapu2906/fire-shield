@@ -20,11 +20,11 @@ Comparison of this RBAC library with popular alternatives in the market.
 | Library | Downloads/month | Stars | Last Update | Bundle Size |
 |---------|----------------|-------|-------------|-------------|
 | **@fire-shield/core** | - | - | Active | ~15KB |
-| **accesscontrol** | ~400K | 1.8K | 2021 | 28KB |
-| **casbin** | ~300K | 17K | Active | 120KB |
-| **rbac** (by Chris Kinsman) | ~50K | 100+ | 2020 | 12KB |
-| **acl** | ~150K | 500+ | 2019 | 35KB |
-| **casl** | ~800K | 5.5K | Active | 45KB |
+| **accesscontrol** | ~266K | 2.3K | 8 years ago | 184KB |
+| **casbin** | ~264K | 2.8K | Active | 633KB |
+| **rbac** (by Chris Kinsman) | ~48K | 1K | Jul 29, 2020 | 132KB |
+| **acl** | ~16.5K | 2.6K | Oct 29, 2019 | 35KB |
+| **casl** | ~2.5M | 6.7K | Active | 356KB |
 
 ### Quick Summary
 
@@ -85,7 +85,7 @@ const ability = new Ability([
 | **Deny permissions** | ✅ Built-in | ❌ No | ✅ Yes | ❌ No | ❌ No |
 | **State persistence** | ✅ Built-in | ❌ Manual | ✅ Built-in | ❌ Manual | ❌ Manual |
 | **TypeScript support** | ✅ Full | 🟡 Partial | ✅ Full | ✅ Full | 🟡 Partial |
-| **Zero dependencies** | ✅ Yes | ❌ No (3) | ❌ No (10+) | ❌ No (5) | ❌ No (2) |
+| **Zero dependencies** | ✅ Yes | ❌ No (1) | ❌ No (5) | ❌ No (1) | ❌ No (5) |
 
 **Winner:** This library for built-in features, casbin for extensibility
 
@@ -97,8 +97,8 @@ const ability = new Ability([
 | **Documentation** | ✅ Excellent | 🟡 Good | ✅ Excellent | ✅ Excellent | 🟡 Basic |
 | **Examples** | ✅ Many | 🟡 Some | ✅ Many | ✅ Many | 🟡 Few |
 | **Framework integration** | ✅ Examples | 🟡 Some | ✅ Many | ✅ Many | 🟡 Basic |
-| **Bundle size** | 15KB | 28KB | 120KB | 45KB | 35KB |
-| **Active maintenance** | ✅ Yes | ❌ No (2021) | ✅ Yes | ✅ Yes | ❌ No (2019) |
+| **Bundle size** | 15KB | 184KB | 633KB | 356KB | 35KB |
+| **Active maintenance** | ✅ Yes | ❌ No (8 years ago) | ✅ Yes | ✅ Yes | ❌ No (Oct 29, 2019) |
 
 **Winner:** This library for simplicity and size, casl for framework integrations
 
@@ -158,9 +158,9 @@ Test: 10,000 users with 5 roles each
 | Library | Minified | Gzipped | Tree-shakeable |
 |---------|----------|---------|----------------|
 | **@fire-shield/core** | 15 KB | 5 KB | ✅ Yes |
-| **accesscontrol** | 28 KB | 9 KB | 🟡 Partial |
-| **casbin** | 120 KB | 35 KB | 🟡 Partial |
-| **casl** | 45 KB | 12 KB | ✅ Yes |
+| **accesscontrol** | 184 KB | 9 KB | 🟡 Partial |
+| **casbin** | 633 KB | 35 KB | 🟡 Partial |
+| **casl** | 356 KB | 12 KB | ✅ Yes |
 | **acl** | 35 KB | 11 KB | ❌ No |
 
 ---
@@ -207,11 +207,11 @@ await enforcer.enforce('alice', 'data1', 'read');
 - ✅ Policy-based - External policy files
 - ✅ Multi-language - Same policies across languages
 - ✅ Many adapters - Database, file, cloud storage
-- ✅ Active community - 17K stars
+- ✅ Active community - 2.8K stars
 
 **Weaknesses:**
 - ❌ Steep learning curve - Requires understanding policy language
-- ❌ Larger bundle - 120KB
+- ❌ Larger bundle - 633KB
 - ❌ Slower performance - 476K ops/sec
 - ❌ Complex setup - Requires config files
 
@@ -239,10 +239,10 @@ ac.can('admin').createAny('video'); // true
 - ✅ Resource-based - Built-in resource concept
 - ✅ Attribute control - Own vs Any resources
 - ✅ Simple API - Easy to understand
-- ✅ Popular - 400K downloads/month
+- ✅ Popular - 266K downloads/month
 
 **Weaknesses:**
-- ❌ Unmaintained - Last update 2021
+- ❌ Unmaintained - Last update 8 years ago
 - ❌ No TypeScript - Type definitions exist but not native
 - ❌ No audit logging
 - ❌ Slower performance - 1M ops/sec
@@ -271,11 +271,11 @@ ability.can('read', 'Article'); // true
 - ✅ Isomorphic - Same code frontend & backend
 - ✅ Conditions - Field-level permissions
 - ✅ TypeScript - Full type safety
-- ✅ Active development - 800K downloads/month
+- ✅ Active development - 2.5M downloads/month
 
 **Weaknesses:**
 - ❌ More complex - Subject-based model
-- ❌ Larger bundle - 45KB
+- ❌ Larger bundle - 356KB
 - ❌ Frontend-focused - Less optimized for backend
 - ❌ No built-in audit logging
 
@@ -304,7 +304,7 @@ acl.isAllowed('admin', 'blog', 'edit', (err, allowed) => {
 - ✅ Multiple backends - Memory, Redis, MongoDB
 
 **Weaknesses:**
-- ❌ Unmaintained - Last update 2019
+- ❌ Unmaintained - Last update Oct 29, 2019
 - ❌ No TypeScript
 - ❌ Callback-based - Old Node.js pattern
 - ❌ No advanced features
@@ -508,7 +508,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 1. Steep learning curve
 2. Complex setup
 3. Slower performance
-4. Large bundle size
+4. Large bundle size (633KB)
 
 **Score: 8/10** - Best for complex enterprise scenarios
 
@@ -524,7 +524,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 
 **Cons:**
 1. More complex API
-2. Larger bundle
+2. Larger bundle (356KB)
 3. No audit logging
 4. Slower than this library
 
@@ -537,10 +537,10 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 **Pros:**
 1. Simple API
 2. Resource-based built-in
-3. Popular (400K downloads)
+3. Popular (266K downloads)
 
 **Cons:**
-1. Unmaintained (2021)
+1. Unmaintained (8 years ago)
 2. No TypeScript
 3. No modern features
 4. Slower
@@ -556,7 +556,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 2. Multiple backends
 
 **Cons:**
-1. Unmaintained (2019)
+1. Unmaintained (Oct 29, 2019)
 2. Callback-based
 3. No TypeScript
 4. No modern features
@@ -629,11 +629,11 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 | Feature | This Library | Casbin | CASL | AccessControl | acl |
 |---------|-------------|---------|------|---------------|-----|
 | **Performance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
-| **Bundle Size** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| **Bundle Size** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐ | ⭐⭐⭐ |
 | **Features** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | **DX** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | **TypeScript** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ |
-| **Maintenance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ |
+| **Maintenance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐ |
 | **Flexibility** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | **Learning Curve** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
 | **OVERALL** | **9/10** | **8/10** | **7/10** | **5/10** | **4/10** |

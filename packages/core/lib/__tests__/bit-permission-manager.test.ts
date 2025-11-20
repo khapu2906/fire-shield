@@ -30,17 +30,40 @@ describe('BitPermissionManager', () => {
 			expect(bit1).toBe(bit2);
 		});
 
-		it('should throw error for invalid manual bit (not power of 2)', () => {
+		it('should throw error for invalid manual bit (not power of 2) in strict mode', () => {
+			const strictManager = new BitPermissionManager({ strictMode: true });
 			expect(() => {
-				manager.registerPermission('invalid', 3); // Not power of 2
+				strictManager.registerPermission('invalid', 3); // Not power of 2
 			}).toThrow('Must be power of 2');
 		});
 
-		it('should throw error for duplicate manual bit', () => {
-			manager.registerPermission('perm1', 4);
+		it('should warn and fallback for invalid manual bit (not power of 2) in non-strict mode', () => {
+			const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+			const bit = manager.registerPermission('invalid', 3); // Not power of 2
+			expect(bit).toBe(1); // Should fallback to auto assignment
+			expect(consoleWarnSpy).toHaveBeenCalledWith(
+				expect.stringContaining('Invalid bit value 3 for permission \'invalid\'')
+			);
+			consoleWarnSpy.mockRestore();
+		});
+
+		it('should throw error for duplicate manual bit in strict mode', () => {
+			const strictManager = new BitPermissionManager({ strictMode: true });
+			strictManager.registerPermission('perm1', 4);
 			expect(() => {
-				manager.registerPermission('perm2', 4); // Same bit
+				strictManager.registerPermission('perm2', 4); // Same bit
 			}).toThrow('already assigned');
+		});
+
+		it('should warn and fallback for duplicate manual bit in non-strict mode', () => {
+			const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+			manager.registerPermission('perm1', 4);
+			const bit = manager.registerPermission('perm2', 4); // Same bit
+			expect(bit).toBe(8); // Should fallback to auto assignment (next after 4)
+			expect(consoleWarnSpy).toHaveBeenCalledWith(
+				expect.stringContaining('Bit 4 already assigned to permission \'perm1\'')
+			);
+			consoleWarnSpy.mockRestore();
 		});
 
 		it('should update nextBitValue when manual bit is higher', () => {

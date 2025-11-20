@@ -9,9 +9,11 @@ export class BitPermissionManager {
 	private nextBitValue: number = 1; // Start with 2^0 = 1
 	private roles: Map<string, number> = new Map(); // Role name -> permission mask
 	private readonly version: string = '1.0.0';
+	private strictMode: boolean = false;
 
 	constructor(options: { startBitValue?: number; strictMode?: boolean } = {}) {
 		this.nextBitValue = options.startBitValue ?? 1;
+		this.strictMode = options.strictMode ?? false;
 	}
 
 	/**
@@ -31,13 +33,33 @@ export class BitPermissionManager {
 		if (manualBit !== undefined) {
 			// Manual bit assignment
 			if (!this.isPowerOfTwo(manualBit)) {
-				throw new Error(`Invalid bit value ${manualBit} for permission '${name}'. Must be power of 2 (1, 2, 4, 8, ...)`);
+				const errorMsg = `Invalid bit value ${manualBit} for permission '${name}'. Must be power of 2 (1, 2, 4, 8, ...)`;
+				if (this.strictMode) {
+					throw new Error(errorMsg);
+				} else {
+					console.warn(errorMsg + ' Using auto-assignment instead.');
+					// Fallback to auto assignment
+					bitValue = this.nextBitValue;
+					this.nextBitValue *= 2;
+					this.permissions.set(name, bitValue);
+					return bitValue;
+				}
 			}
 
 			// Check for conflicts
 			if (this.isBitUsed(manualBit)) {
 				const conflictingPerm = this.getPermissionByBit(manualBit);
-				throw new Error(`Bit ${manualBit} already assigned to permission '${conflictingPerm}'`);
+				const errorMsg = `Bit ${manualBit} already assigned to permission '${conflictingPerm}'`;
+				if (this.strictMode) {
+					throw new Error(errorMsg);
+				} else {
+					console.warn(errorMsg + ' Using auto-assignment instead.');
+					// Fallback to auto assignment
+					bitValue = this.nextBitValue;
+					this.nextBitValue *= 2;
+					this.permissions.set(name, bitValue);
+					return bitValue;
+				}
 			}
 
 			bitValue = manualBit;
