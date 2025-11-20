@@ -1,5 +1,5 @@
-import { defineComponent, h, type PropType, type VNode, type Component } from 'vue';
-import { useRouter, type Router } from 'vue-router';
+import { defineComponent, h, type PropType, type VNode, type Component, inject, getCurrentInstance } from 'vue';
+import { type Router } from 'vue-router';
 import { useCan, useRole, useUser } from './index';
 
 /**
@@ -158,15 +158,10 @@ export const ProtectedRoute = defineComponent({
   },
   setup(props, { slots }) {
     const user = useUser();
-    let router: Router | undefined;
 
-    // Try to get router, but don't throw if not available
-    try {
-      router = useRouter();
-    } catch (e) {
-      // Router not available - component may not be inside router-view
-      router = undefined;
-    }
+    // Get router from app context's global properties to avoid injection warning
+    const instance = getCurrentInstance();
+    const router = instance?.appContext.config.globalProperties.$router as Router | undefined;
 
     const hasPermission = props.permission ? useCan(props.permission) : { value: true };
     const hasRole = props.role ? useRole(props.role) : { value: true };

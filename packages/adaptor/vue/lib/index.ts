@@ -176,14 +176,20 @@ export function useAnyPermission(...permissions: string[]): ComputedRef<boolean>
  */
 const permissionDirective: Directive<HTMLElement, string> = {
   mounted(el, binding, vnode) {
-    const instance = vnode.appContext;
-    if (!instance) {
+    // Try multiple ways to access app context
+    const instance = (binding as any).instance;
+    const appContext = instance?.$?.appContext
+      || instance?.appContext
+      || (vnode as any).ctx?.$?.appContext
+      || (vnode as any).appContext;
+
+    if (!appContext) {
       el.style.display = 'none';
       return;
     }
 
-    const rbac = instance.config.globalProperties.$rbac as RBAC;
-    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
+    const rbac = appContext.config.globalProperties.$rbac as RBAC;
+    const user = appContext.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!rbac || !user) {
       el.style.display = 'none';
@@ -219,13 +225,19 @@ const permissionDirective: Directive<HTMLElement, string> = {
  */
 const roleDirective: Directive<HTMLElement, string> = {
   mounted(el, binding, vnode) {
-    const instance = vnode.appContext;
-    if (!instance) {
+    // Try multiple ways to access app context
+    const instance = (binding as any).instance;
+    const appContext = instance?.$?.appContext
+      || instance?.appContext
+      || (vnode as any).ctx?.$?.appContext
+      || (vnode as any).appContext;
+
+    if (!appContext) {
       el.style.display = 'none';
       return;
     }
 
-    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
+    const user = appContext.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!user) {
       el.style.display = 'none';
@@ -261,14 +273,20 @@ const roleDirective: Directive<HTMLElement, string> = {
  */
 const canDirective: Directive<HTMLElement, string> = {
   mounted(el, binding, vnode) {
-    const instance = vnode.appContext;
-    if (!instance) {
+    // Try multiple ways to access app context
+    const instance = (binding as any).instance;
+    const appContext = instance?.$?.appContext
+      || instance?.appContext
+      || (vnode as any).ctx?.$?.appContext
+      || (vnode as any).appContext;
+
+    if (!appContext) {
       el.style.display = 'none';
       return;
     }
 
-    const rbac = instance.config.globalProperties.$rbac as RBAC;
-    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
+    const rbac = appContext.config.globalProperties.$rbac as RBAC;
+    const user = appContext.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!rbac || !user) {
       el.style.display = 'none';
@@ -304,14 +322,20 @@ const canDirective: Directive<HTMLElement, string> = {
  */
 const cannotDirective: Directive<HTMLElement, string> = {
   mounted(el, binding, vnode) {
-    const instance = vnode.appContext;
-    if (!instance) {
+    // Try multiple ways to access app context
+    const instance = (binding as any).instance;
+    const appContext = instance?.$?.appContext
+      || instance?.appContext
+      || (vnode as any).ctx?.$?.appContext
+      || (vnode as any).appContext;
+
+    if (!appContext) {
       el.style.display = '';
       return;
     }
 
-    const rbac = instance.config.globalProperties.$rbac as RBAC;
-    const user = instance.config.globalProperties.$user as Ref<RBACUser | null>;
+    const rbac = appContext.config.globalProperties.$rbac as RBAC;
+    const user = appContext.config.globalProperties.$user as Ref<RBACUser | null>;
 
     if (!rbac || !user) {
       el.style.display = '';
