@@ -48,11 +48,11 @@ rbac.hasPermission(admin, 'user:delete'); // true ✓
 ### 📦 Smallest Bundle
 
 ```
-Fire Shield:     15 KB ✅
-acl:             35 KB
-AccessControl:  184 KB
-CASL:           356 KB
-Casbin:         633 KB ❌
+Fire Shield:    ~15 KB ✅
+acl:            ~35 KB
+AccessControl: ~180 KB
+CASL:          ~350 KB
+Casbin:        ~600 KB+ ❌
 ```
 
 ### ✨ Most Features
@@ -294,15 +294,15 @@ Fire Shield is perfect for:
 | Feature | Fire Shield | Casbin | CASL | AccessControl | acl |
 |---------|------------|--------|------|---------------|-----|
 | **Performance** | 125M ops/sec ⚡ | 476K | 2M | 1M | 769K |
-| **Bundle Size** | 15KB | 633KB | 356KB | 184KB | 35KB |
+| **Bundle Size** | ~15KB | ~600KB+ | ~350KB | ~180KB | ~35KB |
 | **Downloads/month** | - | 264K | 2.5M | 266K | 16.5K |
 | **Stars** | - | 2.8K | 6.7K | 2.3K | 2.6K |
-| **Wildcards** | ✅ Yes | ✅ Yes (regex) | ✅ Yes | ✅ Yes | ❌ No |
+| **Wildcards** | ✅ Yes | ✅ Yes (regex) | 🟡 Partial | ✅ Yes | ❌ No |
 | **Audit Logging** | ✅ Built-in | 🟡 Plugin | ❌ No | ❌ No | ❌ No |
 | **Deny Permissions** | ✅ Yes | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **TypeScript** | ✅ Native | ✅ Full | ✅ Full | 🟡 Partial | 🟡 Partial |
-| **Dependencies** | 0 ✅ | 10+ | 5 | 3 | 5 |
-| **Maintained** | ✅ Active | ✅ Active | ✅ Active | ❌ 8 years ago | ❌ Oct 2019 |
+| **Dependencies** | 0 ✅ | ~5 | 1 | 0 | Few |
+| **Maintained** | ✅ Active | ✅ Active | ✅ Active | 🟡 Low Activity | 🟡 Old/Little Maintenance |
 
 [**Detailed Comparison →**](./packages/core/docs/COMPARISON.md)
 
@@ -335,6 +335,18 @@ DIB © Fire Shield Team
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md).
+
+---
+
+## ☕ Support the Project
+
+If you find Fire Shield useful, consider supporting its development:
+
+<div align="center">
+  <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="kentphung92" data-color="#FFDD00" data-emoji="🥖"  data-font="Comic" data-text="Buy me a banh mi" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+</div>
+
+Your support helps maintain and improve Fire Shield! 🙏
 
 ---
 

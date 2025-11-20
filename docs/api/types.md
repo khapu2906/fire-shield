@@ -1,16 +1,6 @@
 # TypeScript Types
 
-Complete type reference for RBAC library.
-
-## Table of Contents
-
-- [Core Types](#core-types)
-- [User Types](#user-types)
-- [Configuration Types](#configuration-types)
-- [Audit Types](#audit-types)
-- [Utility Types](#utility-types)
-
----
+Complete TypeScript type definitions for Fire Shield RBAC library.
 
 ## Core Types
 
@@ -37,7 +27,6 @@ interface RBACUser {
 
   /**
    * Optional permission bitmask (for bit-based system)
-   * Calculated from roles and direct permissions
    */
   permissionMask?: number;
 }
@@ -52,8 +41,6 @@ const user: RBACUser = {
   permissionMask: 127
 };
 ```
-
----
 
 ### AuthorizationResult
 
@@ -87,8 +74,6 @@ if (!result.allowed) {
 }
 ```
 
----
-
 ### AuthorizationContext
 
 Context for authorization with additional metadata.
@@ -113,7 +98,7 @@ interface AuthorizationContext {
   /**
    * Optional additional context
    */
-  metadata?: Record<string, any>;
+  metadata?: Record&lt;string, any&gt;;
 }
 ```
 
@@ -131,76 +116,6 @@ const context: AuthorizationContext = {
 
 const result = rbac.authorizeWithContext(context);
 ```
-
----
-
-## User Types
-
-### UserRole
-
-Represents a role with permissions and metadata.
-
-```typescript
-interface UserRole {
-  /**
-   * Role name
-   */
-  name: string;
-
-  /**
-   * Permission names assigned to this role
-   */
-  permissions: string[];
-
-  /**
-   * Permission bitmask (bit-based system only)
-   */
-  permissionMask?: number;
-
-  /**
-   * Optional role description
-   */
-  description?: string;
-
-  /**
-   * Optional metadata
-   */
-  metadata?: Record<string, any>;
-}
-```
-
-**Example:**
-```typescript
-const editorRole: UserRole = {
-  name: 'editor',
-  permissions: ['post:read', 'post:write'],
-  permissionMask: 3,
-  description: 'Content editor with read/write access',
-  metadata: {
-    department: 'Content',
-    createdAt: '2025-01-01'
-  }
-};
-```
-
----
-
-### PermissionMask
-
-Type alias for permission bitmask.
-
-```typescript
-type PermissionMask = number;
-```
-
-**Usage:**
-```typescript
-const readMask: PermissionMask = 1;  // 2^0
-const writeMask: PermissionMask = 2; // 2^1
-const combinedMask: PermissionMask = readMask | writeMask; // 3
-```
-
----
 
 ## Configuration Types
 
@@ -257,8 +172,6 @@ const config: RBACConfig = {
 const rbac = new RBAC(config);
 ```
 
----
-
 ### RBACConfigSchema
 
 Schema for defining permissions and roles.
@@ -268,25 +181,25 @@ interface RBACConfigSchema {
   /**
    * Permission definitions
    */
-  permissions: Array<{
+  permissions: Array&lt;{
     name: string;
     bit?: number;
     resource?: string;
     action?: string;
     description?: string;
-    metadata?: Record<string, any>;
-  }>;
+    metadata?: Record&lt;string, any&gt;;
+  }&gt;;
 
   /**
    * Role definitions
    */
-  roles: Array<{
+  roles: Array&lt;{
     name: string;
     permissions: string[];
     level?: number;
     description?: string;
-    metadata?: Record<string, any>;
-  }>;
+    metadata?: Record&lt;string, any&gt;;
+  }&gt;;
 
   /**
    * Optional configuration options
@@ -312,15 +225,9 @@ const schema: RBACConfigSchema = {
       level: 10,
       description: 'Administrator role'
     }
-  ],
-  options: {
-    autoBitAssignment: true,
-    validatePermissions: true
-  }
+  ]
 };
 ```
-
----
 
 ### PresetConfig
 
@@ -341,21 +248,21 @@ interface PresetConfig {
   /**
    * Permission definitions
    */
-  permissions: Array<{
+  permissions: Array&lt;{
     name: string;
     bit?: number;
     resource?: string;
     action?: string;
-  }>;
+  }&gt;;
 
   /**
    * Role definitions
    */
-  roles: Array<{
+  roles: Array&lt;{
     name: string;
     permissions: string[];
     level?: number;
-  }>;
+  }&gt;;
 
   /**
    * Configuration options
@@ -365,26 +272,6 @@ interface PresetConfig {
   };
 }
 ```
-
-**Example:**
-```typescript
-const blogPreset: PresetConfig = {
-  name: 'blog-system',
-  description: 'Blog application permissions',
-  permissions: [
-    { name: 'post:read', bit: 1 },
-    { name: 'post:write', bit: 2 }
-  ],
-  roles: [
-    { name: 'author', permissions: ['post:read', 'post:write'], level: 5 }
-  ],
-  options: {
-    autoBitAssignment: true
-  }
-};
-```
-
----
 
 ## Audit Types
 
@@ -431,23 +318,6 @@ interface AuditEvent {
 }
 ```
 
-**Example:**
-```typescript
-const event: AuditEvent = {
-  type: 'permission_check',
-  userId: 'user-123',
-  permission: 'post:write',
-  allowed: true,
-  context: {
-    roles: ['editor'],
-    ip: '192.168.1.1'
-  },
-  timestamp: Date.now()
-};
-```
-
----
-
 ### AuditEventContext
 
 Additional context for audit events.
@@ -482,11 +352,9 @@ interface AuditEventContext {
   /**
    * Additional metadata
    */
-  metadata?: Record<string, any>;
+  metadata?: Record&lt;string, any&gt;;
 }
 ```
-
----
 
 ### AuditLogger
 
@@ -498,12 +366,12 @@ interface AuditLogger {
    * Log an audit event
    * Can be sync or async
    */
-  log(event: AuditEvent): void | Promise<void>;
+  log(event: AuditEvent): void | Promise&lt;void&gt;;
 
   /**
    * Optional flush method for buffered loggers
    */
-  flush?(): void | Promise<void>;
+  flush?(): void | Promise&lt;void&gt;;
 }
 ```
 
@@ -520,99 +388,57 @@ class CustomAuditLogger implements AuditLogger {
 }
 ```
 
----
+## Role Types
 
-## Utility Types
+### UserRole
 
-### RBACSystemState
-
-Serialized state of RBAC system.
+Represents a role with permissions and metadata.
 
 ```typescript
-interface RBACSystemState {
+interface UserRole {
   /**
-   * Bit-based system enabled
+   * Role name
    */
-  useBitSystem: boolean;
+  name: string;
 
   /**
-   * Wildcards enabled
+   * Permission names assigned to this role
    */
-  enableWildcards: boolean;
+  permissions: string[];
 
   /**
-   * All registered permissions
+   * Permission bitmask (bit-based system only)
    */
-  permissions: Array<{
-    name: string;
-    bit?: number;
-  }>;
+  permissionMask?: number;
 
   /**
-   * All registered roles
+   * Optional role description
    */
-  roles: Array<{
-    name: string;
-    permissions: string[];
-    permissionMask?: number;
-  }>;
+  description?: string;
 
   /**
-   * Role hierarchy levels
+   * Optional metadata
    */
-  hierarchy: Record<string, number>;
-
-  /**
-   * Denied permissions by user ID
-   */
-  denyList: Record<string, string[]>;
+  metadata?: Record&lt;string, any&gt;;
 }
 ```
 
-**Example:**
-```typescript
-// Serialize
-const state: RBACSystemState = rbac.serialize();
+### PermissionMask
 
-// Save to database
-await database.save('rbac-state', state);
-
-// Restore
-const loadedState: RBACSystemState = await database.load('rbac-state');
-rbac.deserialize(loadedState);
-```
-
----
-
-### BuilderOptions
-
-Options for RBACBuilder.
+Type alias for permission bitmask.
 
 ```typescript
-interface BuilderOptions {
-  /**
-   * Use bit-based system
-   */
-  useBitSystem?: boolean;
-
-  /**
-   * Enable strict mode
-   */
-  strictMode?: boolean;
-
-  /**
-   * Enable wildcards
-   */
-  enableWildcards?: boolean;
-
-  /**
-   * Audit logger
-   */
-  auditLogger?: AuditLogger;
-}
+type PermissionMask = number;
 ```
 
----
+**Usage:**
+```typescript
+const readMask: PermissionMask = 1;  // 2^0
+const writeMask: PermissionMask = 2; // 2^1
+const combinedMask: PermissionMask = readMask | writeMask; // 3
+```
+
+## Permission Types
 
 ### PermissionDefinition
 
@@ -648,26 +474,9 @@ interface PermissionDefinition {
   /**
    * Optional metadata
    */
-  metadata?: Record<string, any>;
+  metadata?: Record&lt;string, any&gt;;
 }
 ```
-
-**Example:**
-```typescript
-const permission: PermissionDefinition = {
-  name: 'user:delete',
-  bit: 8,
-  resource: 'user',
-  action: 'delete',
-  description: 'Delete user accounts',
-  metadata: {
-    dangerous: true,
-    requiresApproval: true
-  }
-};
-```
-
----
 
 ### RoleDefinition
 
@@ -698,25 +507,69 @@ interface RoleDefinition {
   /**
    * Optional metadata
    */
-  metadata?: Record<string, any>;
+  metadata?: Record&lt;string, any&gt;;
+}
+```
+
+## State Types
+
+### RBACSystemState
+
+Serialized state of RBAC system.
+
+```typescript
+interface RBACSystemState {
+  /**
+   * Bit-based system enabled
+   */
+  useBitSystem: boolean;
+
+  /**
+   * Wildcards enabled
+   */
+  enableWildcards: boolean;
+
+  /**
+   * All registered permissions
+   */
+  permissions: Array&lt;{
+    name: string;
+    bit?: number;
+  }&gt;;
+
+  /**
+   * All registered roles
+   */
+  roles: Array&lt;{
+    name: string;
+    permissions: string[];
+    permissionMask?: number;
+  }&gt;;
+
+  /**
+   * Role hierarchy levels
+   */
+  hierarchy: Record&lt;string, number&gt;;
+
+  /**
+   * Denied permissions by user ID
+   */
+  denyList: Record&lt;string, string[]&gt;;
 }
 ```
 
 **Example:**
 ```typescript
-const role: RoleDefinition = {
-  name: 'admin',
-  permissions: ['user:*', 'post:*'],
-  level: 100,
-  description: 'System administrator',
-  metadata: {
-    department: 'IT',
-    maxUsers: 5
-  }
-};
-```
+// Serialize
+const state: RBACSystemState = rbac.serialize();
 
----
+// Save to storage
+localStorage.setItem('rbac-state', JSON.stringify(state));
+
+// Restore
+const savedState = JSON.parse(localStorage.getItem('rbac-state')!);
+rbac.deserialize(savedState);
+```
 
 ## Type Guards
 
@@ -731,6 +584,14 @@ function isRBACUser(obj: any): obj is RBACUser {
     typeof obj.id === 'string' &&
     Array.isArray(obj.roles)
   );
+}
+```
+
+**Usage:**
+```typescript
+if (isRBACUser(maybeUser)) {
+  // TypeScript knows this is an RBACUser
+  rbac.hasPermission(maybeUser, 'post:read');
 }
 ```
 
@@ -749,23 +610,21 @@ function isAuditEvent(obj: any): obj is AuditEvent {
 }
 ```
 
----
-
 ## Generic Types
 
-### WithMetadata<T>
+### WithMetadata&lt;T&gt;
 
 Add metadata to any type.
 
 ```typescript
-type WithMetadata<T> = T & {
-  metadata?: Record<string, any>;
+type WithMetadata&lt;T&gt; = T & {
+  metadata?: Record&lt;string, any&gt;;
 };
 ```
 
 **Example:**
 ```typescript
-type UserWithMetadata = WithMetadata<RBACUser>;
+type UserWithMetadata = WithMetadata&lt;RBACUser&gt;;
 
 const user: UserWithMetadata = {
   id: 'user-1',
@@ -776,8 +635,6 @@ const user: UserWithMetadata = {
   }
 };
 ```
-
----
 
 ## Const Enums
 
@@ -795,11 +652,12 @@ const enum PermissionCheckType {
 ```typescript
 const event: AuditEvent = {
   type: PermissionCheckType.PERMISSION_CHECK,
-  // ...
+  userId: 'user-1',
+  permission: 'post:read',
+  allowed: true,
+  timestamp: Date.now()
 };
 ```
-
----
 
 ## Import Paths
 
@@ -825,17 +683,126 @@ import type {
   AuditLogger
 } from '@fire-shield/core';
 
-// Utility types
+// Role types
 import type {
-  RBACSystemState,
+  UserRole,
+  PermissionMask,
   PermissionDefinition,
   RoleDefinition
 } from '@fire-shield/core';
+
+// State types
+import type {
+  RBACSystemState
+} from '@fire-shield/core';
 ```
 
----
+## Type Utilities
 
-See also:
-- [API Reference](./API_REFERENCE.md) - Complete API documentation
-- [Core Concepts](./CORE_CONCEPTS.md) - Understanding RBAC fundamentals
-- [Examples](./EXAMPLES.md) - Real-world usage examples
+### Extending Types
+
+```typescript
+// Extend RBACUser with custom fields
+interface AppUser extends RBACUser {
+  email: string;
+  name: string;
+  department: string;
+}
+
+const user: AppUser = {
+  id: 'user-1',
+  roles: ['editor'],
+  email: 'user@example.com',
+  name: 'John Doe',
+  department: 'Engineering'
+};
+```
+
+### Type-Safe Permissions
+
+```typescript
+// Define allowed permissions as const
+const PERMISSIONS = {
+  USER_READ: 'user:read',
+  USER_WRITE: 'user:write',
+  POST_READ: 'post:read',
+  POST_WRITE: 'post:write',
+} as const;
+
+type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+
+// Type-safe permission checks
+function checkPermission(user: RBACUser, permission: Permission): boolean {
+  return rbac.hasPermission(user, permission);
+}
+
+// ✅ Valid
+checkPermission(user, PERMISSIONS.USER_READ);
+
+// ❌ Type error
+checkPermission(user, 'invalid:permission');
+```
+
+### Type-Safe Roles
+
+```typescript
+// Define allowed roles
+type Role = 'admin' | 'editor' | 'viewer';
+
+function hasRole(user: RBACUser, role: Role): boolean {
+  return user.roles.includes(role);
+}
+
+// ✅ Valid
+hasRole(user, 'admin');
+
+// ❌ Type error
+hasRole(user, 'invalid-role');
+```
+
+## Best Practices
+
+### 1. Always Use TypeScript
+
+```typescript
+// ✅ Good: Full type safety
+import type { RBACUser } from '@fire-shield/core';
+
+const user: RBACUser = {
+  id: 'user-1',
+  roles: ['editor']
+};
+```
+
+### 2. Define Custom Types
+
+```typescript
+// ✅ Good: Define app-specific types
+interface AppUser extends RBACUser {
+  email: string;
+  name: string;
+}
+```
+
+### 3. Use Type Guards
+
+```typescript
+// ✅ Good: Validate at runtime
+if (isRBACUser(userData)) {
+  rbac.hasPermission(userData, 'post:read');
+}
+```
+
+### 4. Const Assertions
+
+```typescript
+// ✅ Good: Type-safe constants
+const ROLES = ['admin', 'editor', 'viewer'] as const;
+type Role = typeof ROLES[number];
+```
+
+## Next Steps
+
+- Learn about [Core API](/api/core)
+- Explore [RBAC Builder](/api/builder)
+- Check out [TypeScript Guide](/guide/typescript)

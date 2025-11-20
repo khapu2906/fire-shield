@@ -70,8 +70,8 @@ const rbac = new RBAC({
 });
 
 // Logs to console:
-// [AUDIT 2024-01-15T10:30:00.000Z] ✓ ALLOWED: User user-123 - post:read
-// [AUDIT 2024-01-15T10:30:01.000Z] ✗ DENIED: User user-123 - admin:delete
+// [AUDIT 2025-01-15T10:30:00.000Z] ✓ ALLOWED: User user-123 - post:read
+// [AUDIT 2025-01-15T10:30:01.000Z] ✗ DENIED: User user-123 - admin:delete
 //   Reason: User lacks permission: admin:delete
 ```
 

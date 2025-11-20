@@ -20,11 +20,11 @@ Comparison of this RBAC library with popular alternatives in the market.
 | Library | Downloads/month | Stars | Last Update | Bundle Size |
 |---------|----------------|-------|-------------|-------------|
 | **@fire-shield/core** | - | - | Active | ~15KB |
-| **accesscontrol** | ~266K | 2.3K | 8 years ago | 184KB |
-| **casbin** | ~264K | 2.8K | Active | 633KB |
+| **accesscontrol** | ~266K | 2.3K | Low Activity | ~180KB |
+| **casbin** | ~264K | 2.8K | Active | ~600KB+ |
 | **rbac** (by Chris Kinsman) | ~48K | 1K | Jul 29, 2020 | 132KB |
-| **acl** | ~16.5K | 2.6K | Oct 29, 2019 | 35KB |
-| **casl** | ~2.5M | 6.7K | Active | 356KB |
+| **acl** | ~16.5K | 2.6K | Old/Little Maintenance | ~35KB |
+| **casl** | ~2.5M | 6.7K | Active | ~350KB |
 
 ### Quick Summary
 
@@ -59,7 +59,7 @@ const ability = new Ability([
 |---------|-------------|---------------|--------|------|-----|
 | **Bit-based permissions** | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
 | **String-based permissions** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Wildcard patterns** | ✅ Yes (`admin:*`) | ✅ Yes | ✅ Yes (regex) | ✅ Yes | ❌ No |
+| **Wildcard patterns** | ✅ Yes (`admin:*`) | ✅ Yes | ✅ Yes (regex) | 🟡 Partial | ❌ No |
 | **Performance (ops/sec)** | 125M | 1M | 500K | 2M | 800K |
 | **Resource-based** | ✅ Manual | ✅ Built-in | ✅ Built-in | ✅ Built-in | ✅ Built-in |
 | **Attribute-based (ABAC)** | 🟡 Partial | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No |
@@ -85,7 +85,7 @@ const ability = new Ability([
 | **Deny permissions** | ✅ Built-in | ❌ No | ✅ Yes | ❌ No | ❌ No |
 | **State persistence** | ✅ Built-in | ❌ Manual | ✅ Built-in | ❌ Manual | ❌ Manual |
 | **TypeScript support** | ✅ Full | 🟡 Partial | ✅ Full | ✅ Full | 🟡 Partial |
-| **Zero dependencies** | ✅ Yes | ❌ No (1) | ❌ No (5) | ❌ No (1) | ❌ No (5) |
+| **Zero dependencies** | ✅ Yes | ✅ Yes (0) | ❌ No (~5) | ❌ No (1) | ❌ No (Few) |
 
 **Winner:** This library for built-in features, casbin for extensibility
 
@@ -97,8 +97,8 @@ const ability = new Ability([
 | **Documentation** | ✅ Excellent | 🟡 Good | ✅ Excellent | ✅ Excellent | 🟡 Basic |
 | **Examples** | ✅ Many | 🟡 Some | ✅ Many | ✅ Many | 🟡 Few |
 | **Framework integration** | ✅ Examples | 🟡 Some | ✅ Many | ✅ Many | 🟡 Basic |
-| **Bundle size** | 15KB | 184KB | 633KB | 356KB | 35KB |
-| **Active maintenance** | ✅ Yes | ❌ No (8 years ago) | ✅ Yes | ✅ Yes | ❌ No (Oct 29, 2019) |
+| **Bundle size** | ~15KB | ~180KB | ~600KB+ | ~350KB | ~35KB |
+| **Active maintenance** | ✅ Yes | 🟡 Low Activity | ✅ Yes | ✅ Yes | 🟡 Old/Little Maintenance |
 
 **Winner:** This library for simplicity and size, casl for framework integrations
 
@@ -157,11 +157,11 @@ Test: 10,000 users with 5 roles each
 
 | Library | Minified | Gzipped | Tree-shakeable |
 |---------|----------|---------|----------------|
-| **@fire-shield/core** | 15 KB | 5 KB | ✅ Yes |
-| **accesscontrol** | 184 KB | 9 KB | 🟡 Partial |
-| **casbin** | 633 KB | 35 KB | 🟡 Partial |
-| **casl** | 356 KB | 12 KB | ✅ Yes |
-| **acl** | 35 KB | 11 KB | ❌ No |
+| **@fire-shield/core** | ~15 KB | ~5 KB | ✅ Yes |
+| **accesscontrol** | ~180 KB | ~9 KB | 🟡 Partial |
+| **casbin** | ~600 KB+ | ~35 KB | 🟡 Partial |
+| **casl** | ~350 KB | ~12 KB | ✅ Yes |
+| **acl** | ~35 KB | ~11 KB | ❌ No |
 
 ---
 
@@ -211,7 +211,7 @@ await enforcer.enforce('alice', 'data1', 'read');
 
 **Weaknesses:**
 - ❌ Steep learning curve - Requires understanding policy language
-- ❌ Larger bundle - 633KB
+- ❌ Larger bundle - ~600KB+
 - ❌ Slower performance - 476K ops/sec
 - ❌ Complex setup - Requires config files
 
@@ -242,7 +242,7 @@ ac.can('admin').createAny('video'); // true
 - ✅ Popular - 266K downloads/month
 
 **Weaknesses:**
-- ❌ Unmaintained - Last update 8 years ago
+- ❌ Low Activity - Limited recent updates
 - ❌ No TypeScript - Type definitions exist but not native
 - ❌ No audit logging
 - ❌ Slower performance - 1M ops/sec
@@ -275,7 +275,7 @@ ability.can('read', 'Article'); // true
 
 **Weaknesses:**
 - ❌ More complex - Subject-based model
-- ❌ Larger bundle - 356KB
+- ❌ Larger bundle - ~350KB
 - ❌ Frontend-focused - Less optimized for backend
 - ❌ No built-in audit logging
 
@@ -304,7 +304,7 @@ acl.isAllowed('admin', 'blog', 'edit', (err, allowed) => {
 - ✅ Multiple backends - Memory, Redis, MongoDB
 
 **Weaknesses:**
-- ❌ Unmaintained - Last update Oct 29, 2019
+- ❌ Old/Little Maintenance - Last update Oct 29, 2019
 - ❌ No TypeScript
 - ❌ Callback-based - Old Node.js pattern
 - ❌ No advanced features
@@ -479,7 +479,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 
 **Pros:**
 1. ⚡ **Fastest** - 15-260x faster than alternatives
-2. 📦 **Smallest** - 15KB vs 28-120KB
+2. 📦 **Smallest** - ~15KB vs ~35-600KB+
 3. 🔒 **Most secure** - Built-in audit logging, deny permissions
 4. 🎯 **Most flexible** - Wildcards, bit-based, string-based
 5. 📘 **Best DX** - Excellent docs, examples, TypeScript
@@ -508,7 +508,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 1. Steep learning curve
 2. Complex setup
 3. Slower performance
-4. Large bundle size (633KB)
+4. Large bundle size (~600KB+)
 
 **Score: 8/10** - Best for complex enterprise scenarios
 
@@ -524,7 +524,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 
 **Cons:**
 1. More complex API
-2. Larger bundle (356KB)
+2. Larger bundle (~350KB)
 3. No audit logging
 4. Slower than this library
 
@@ -540,7 +540,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 3. Popular (266K downloads)
 
 **Cons:**
-1. Unmaintained (8 years ago)
+1. Low Activity - Limited recent updates
 2. No TypeScript
 3. No modern features
 4. Slower
@@ -556,7 +556,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 2. Multiple backends
 
 **Cons:**
-1. Unmaintained (Oct 29, 2019)
+1. Old/Little Maintenance (Oct 29, 2019)
 2. Callback-based
 3. No TypeScript
 4. No modern features

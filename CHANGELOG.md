@@ -2,7 +2,42 @@
 
 All notable changes to Fire Shield will be documented in this file.
 
-## [2.0.0] - 2024-11-18
+## [2.1.1] - 2025-11-20
+
+### 🎯 Current Release
+
+#### ✨ Enhancements
+
+**Documentation**
+- ✅ VitePress Documentation - 50+ pages with interactive examples
+- ✅ Complete roadmap with v2.2-v2.4 planning
+- ✅ Comparison table with verified data (Casbin, CASL, AccessControl, acl)
+- ✅ JSON config file loading documentation
+- ✅ Buy Me a Coffee support button integration
+
+**Testing**
+- ✅ 241+ test cases - 100% pass rate, 2106+ lines
+- ✅ Comprehensive coverage across all adapters
+
+**Framework Adapters**
+- ✅ Express v2.0.5 - Middleware with guards
+- ✅ Fastify v2.0.5 - preHandler hooks
+- ✅ Hono v2.0.5 - Edge runtime support
+- ✅ Next.js v2.0.1 - App Router integration
+- ✅ Nuxt v2.0.1 - Nuxt 3 module
+- ✅ React v2.0.2 - Hooks & components
+- ✅ Vue v2.0.8 - Composables, directives, router guards
+- ✅ Angular v2.0.1 - Services, guards, directives
+- ✅ Svelte v2.0.1 - Stores & actions
+
+#### 📦 Package Details
+- Bundle Size: ~15KB (verified)
+- Dependencies: 0
+- TypeScript: 100% type coverage
+
+---
+
+## [2.0.0] - 2025-11-18
 
 ### 🎉 Major Release - Fire Shield Branding
 

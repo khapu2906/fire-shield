@@ -191,8 +191,8 @@ rbac.createRole('beta-tester', ['feature:beta']);
 const betaUser = { id: 'beta-1', roles: ['beta-tester'] };
 
 const betaTimeConstraint = {
-  validFrom: new Date('2024-01-01'),
-  validUntil: new Date('2024-12-31')
+  validFrom: new Date('2025-01-01'),
+  validUntil: new Date('2025-12-31')
 };
 
 console.log('\nTime-based permissions:');
@@ -333,7 +333,7 @@ const timeRestrictedContext: AuthContext = {
     metadata: { accessHours: { start: 9, end: 17 } }
   },
   action: 'edit',
-  environment: { time: new Date('2024-01-01T22:00:00') } // 10 PM
+  environment: { time: new Date('2025-01-01T22:00:00') } // 10 PM
 };
 const timeResult = customEngine.authorize(timeRestrictedContext);
 console.log(`Time restricted access: ${timeResult.allowed} (${timeResult.reason})`);
