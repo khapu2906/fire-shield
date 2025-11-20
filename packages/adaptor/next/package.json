@@ -1,0 +1,37 @@
+{
+  "name": "@fire-shield/next",
+  "version": "2.0.0",
+  "description": "Next.js adapter for RBAC authorization",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": ["rbac", "nextjs", "middleware", "authorization"],
+  "author": "Fire Shield Team",
+  "license": "DIB",
+  "dependencies": {
+    "@fire-shield/core": "^2.0.8"
+  },
+  "devDependencies": {
+    "next": "^14.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {
+    "next": "^13.0.0 || ^14.0.0 || ^15.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khapu2906/fire-shield.git",
+    "directory": "packages/adaptor/next"
+  },
+  "homepage": "https://github.com/khapu2906/fire-shield#readme",
+  "bugs": {
+    "url": "https://github.com/khapu2906/fire-shield/issues"
+  }
+}
