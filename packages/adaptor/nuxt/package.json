@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/nuxt",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Nuxt.js adapter for RBAC authorization",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.0.8"
+    "@fire-shield/core": "^2.1.1"
   },
   "devDependencies": {
     "@nuxt/kit": "^3.0.0",

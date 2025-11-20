@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/vue",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Vue adapter for RBAC with composables, directives, and navigation guards",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.0.0"
+    "@fire-shield/core": "^2.1.1"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

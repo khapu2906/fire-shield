@@ -1,5 +1,5 @@
 import type { App, Directive, ComputedRef } from 'vue';
-import { computed, inject, provide, ref, type Ref } from 'vue';
+import { computed, inject, ref, type Ref } from 'vue';
 import type { Router, RouteLocationNormalized, NavigationGuardNext } from 'vue-router';
 import { RBAC, type RBACUser, type AuthorizationResult } from '@fire-shield/core';
 
@@ -229,7 +229,7 @@ const roleDirective: Directive<HTMLElement, string> = {
     // Watch for user changes
     (el as any)._roleCheck = checkRole;
   },
-  updated(el, binding) {
+  updated(el,) {
     if ((el as any)._roleCheck) {
       (el as any)._roleCheck();
     }
