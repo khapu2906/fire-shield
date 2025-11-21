@@ -14,7 +14,7 @@ Fire Shield development roadmap and upcoming features.
 ### v2.1.1 - Current Release (November 2025)
 
 **Core Features**
-- ✅ **Bit-based Permission System** - 125M ops/sec, O(1) permission checks
+- ✅ **Bit-based Permission System** - about one hundred million ops/sec, O(1) permission checks
 - ✅ **String-based Fallback System** - Support for >31 permissions
 - ✅ **Wildcard Permissions** - Pattern matching (`admin:*`, `*:read`, `tenant:123:*`)
 - ✅ **Deny Permissions** - Explicit denials that override allows

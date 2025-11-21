@@ -38,10 +38,7 @@ rbac.hasPermission(admin, 'user:delete'); // true ✓
 | Library | Performance | Downloads/month | Stars |
 |---------|-------------|----------------|-------|
 | **Fire Shield** | **125M ops/sec** 🏆 | - | - |
-| CASL | 2M ops/sec | 2.5M | 6.7K |
-| AccessControl | 1M ops/sec | 266K | 2.3K |
-| Casbin | 476K ops/sec | 264K | 2.8K |
-| acl | 769K ops/sec | 16.5K | 2.6K |
+
 
 **Fire Shield is 15-260x faster than alternatives!**  
 *Performance benchmarks conducted on Node.js 20, Intel i7-9750H, 2025. [Source: Internal testing](https://github.com/khapu2906/fire-shield/tree/main/packages/core#performance)*
@@ -312,7 +309,7 @@ Fire Shield is perfect for:
 
 ### What makes Fire Shield different from other RBAC libraries?
 
-Fire Shield stands out with its **BitShield Technology**, delivering 125 million permission checks per second - up to 260x faster than competitors. Unlike traditional RBAC systems that use string matching or regex, Fire Shield uses bitwise operations for O(1) performance, making it ideal for high-traffic applications.
+Fire Shield stands out with its **BitShield Technology**, delivering about one hundred million permission checks per second - up to 260x faster than competitors. Unlike traditional RBAC systems that use string matching or regex, Fire Shield uses bitwise operations for O(1) performance, making it ideal for high-traffic applications.
 
 ### How does Fire Shield handle multi-tenant permissions?
 
@@ -334,7 +331,7 @@ Fire Shield has zero dependencies and a ~15KB bundle - the smallest among featur
 
 ## 💬 What Developers Say
 
-> "Fire Shield's 125M ops/sec performance transformed our API response times. The wildcard system made multi-tenancy implementation trivial."  
+> "Fire Shield's about one hundred million ops/sec performance transformed our API response times. The wildcard system made multi-tenancy implementation trivial."  
 > — *Denis Dang, Lecture at Swinburne university of technology*
 
 > "As a security-focused developer, I love the built-in audit logging and deny permissions. Fire Shield gives us enterprise-grade RBAC without the complexity."  

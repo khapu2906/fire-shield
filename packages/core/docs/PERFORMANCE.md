@@ -368,8 +368,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Performance: ~2ms per request (3 × O(n) lookups)
-// At 10,000 req/s: 20,000ms CPU time = 20 cores needed
+
 ```
 
 **With optimization:**
@@ -389,9 +388,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Performance: ~0.01ms per request (O(1) bitwise AND)
-// At 10,000 req/s: 100ms CPU time = 0.1 cores needed
-// 200x improvement!
 ```
 
 ### Example 2: Audit Logging in Production

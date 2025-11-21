@@ -54,7 +54,6 @@ All notable changes to Fire Shield will be documented in this file.
   - BufferedAuditLogger - Production-optimized batched logging
   - MultiAuditLogger - Log to multiple destinations
 - ✅ Deny Permissions - Explicit permission denials that override allows
-- ✅ Bit-based Performance - 125M ops/sec (15-260x faster than alternatives)
 - ✅ Zero Dependencies - No supply chain risks
 - ✅ Full TypeScript Support - 100% type-safe
 
@@ -80,7 +79,6 @@ All notable changes to Fire Shield will be documented in this file.
 - 176+ tests with 100% pass rate
 
 #### 🚀 Performance
-- 125 million operations per second
 - 15KB bundle size (minified)
 - O(1) permission checks with bit-based system
 - <0.01ms overhead with buffered audit logging
