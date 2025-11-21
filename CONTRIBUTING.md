@@ -4,7 +4,7 @@ Thank you for your interest in contributing to Fire Shield! 🚀
 
 ## About Fire Shield
 
-Fire Shield is a lightning-fast, zero-dependency RBAC (Role-Based Access Control) library for TypeScript/JavaScript, delivering **about one hundred million permission checks per second** with BitShield Technology. Created by Kent Phung, a software engineer with 10+ years of experience in Cloud solutions, Computer Vision, and high-performance libraries.
+Fire Shield is a lightning-fast, zero-dependency RBAC (Role-Based Access Control) library for TypeScript/JavaScript, delivering **about one hundred million permission checks per second**. Created by Kent Phung, a software engineer with 10+ years of experience in Cloud solutions, Computer Vision, and high-performance libraries.
 
 ## Ways to Contribute
 

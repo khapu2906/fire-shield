@@ -6,13 +6,8 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# Nx
-.nx/
-dist/
-build/
-.cache/
-
 cache/
+dist
 
 
 # Environment variables
@@ -28,29 +23,7 @@ apps/*/build/
 libs/*/dist/
 libs/*/build/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.egg
-*.egg-info/
-.eggs/
-pip-log.txt
-pip-delete-this-directory.txt
 
-# Python virtual environments
-venv/
-.venv/
-ENV/
-env/
-apps/api/.venv/
-apps/api/venv/
-
-# uv
-uv.lock
-.uv/
 
 # IDEs
 .vscode/
@@ -73,7 +46,7 @@ htmlcov/
 .tmp/
 tmp/
 temp/
-
+plan
 # Lock files (keep package-lock.json for reproducibility)
 # Uncomment if using yarn or pnpm
 # yarn.lock

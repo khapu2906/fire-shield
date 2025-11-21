@@ -309,7 +309,7 @@ Fire Shield is perfect for:
 
 ### What makes Fire Shield different from other RBAC libraries?
 
-Fire Shield stands out with its **BitShield Technology**, delivering about one hundred million permission checks per second - up to 260x faster than competitors. Unlike traditional RBAC systems that use string matching or regex, Fire Shield uses bitwise operations for O(1) performance, making it ideal for high-traffic applications.
+Fire Shield stands out with its **BitMark**, delivering about one hundred million permission checks per second - up to 260x faster than competitors. Unlike traditional RBAC systems that use string matching or regex, Fire Shield uses bitwise operations for O(1) performance, making it ideal for high-traffic applications.
 
 ### How does Fire Shield handle multi-tenant permissions?
 
