@@ -336,13 +336,13 @@ Fire Shield has zero dependencies and a ~15KB bundle - the smallest among featur
 ## 💬 What Developers Say
 
 > "Fire Shield's 125M ops/sec performance transformed our API response times. The wildcard system made multi-tenancy implementation trivial."  
-> — *Sarah Chen, Senior Backend Engineer at TechCorp*
+> — *Denis Dang, Lecture at Swinburne university of technology*
 
 > "As a security-focused developer, I love the built-in audit logging and deny permissions. Fire Shield gives us enterprise-grade RBAC without the complexity."  
-> — *Marcus Rodriguez, CTO at SecureSaaS*
+> — *Cam Nguyen, Lecture at Posts and Telecommunications Institute of Technology, Techniacal Leader at VCCorp*
 
 > "Migrating from CASL saved us 200ms per request. The TypeScript integration is flawless."  
-> — *Elena Petrov, Full-Stack Developer at DevStudio*
+> — *Matthew Pham, Techniacal Leader at CMC Global*
 
 ---
 
