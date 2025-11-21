@@ -58,7 +58,6 @@ Casbin:        ~600 KB+ ❌
 
 ### ✨ Most Features
 
-- ✅ **BitShield Technology** - Ultra-fast O(1) permission checks with patented bitmask optimization
 - ✅ **Wildcard Permissions** - `admin:*`, `*:read`, `tenant:123:*`
 - ✅ **Audit Logging** - Built-in compliance & security logging
 - ✅ **Deny Permissions** - Explicit denials override allows
