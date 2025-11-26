@@ -120,7 +120,7 @@ const ability = new Ability([
 ### 1. This Library (@fire-shield/core)
 
 **Strengths:**
-- ✅ **Fastest permission checks** - about one hundred million ops/sec with bit-based system
+- ✅ **Fastest permission checks** - up to 10 million ops/sec with bit-based system
 - ✅ **Smallest bundle size** - 25KB minified
 - ✅ **Zero dependencies** - No supply chain risks
 - ✅ **Built-in audit logging** - For compliance and security

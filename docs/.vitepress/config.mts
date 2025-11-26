@@ -13,7 +13,7 @@ export default defineConfig({
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Fire Shield",
-      "description": "Lightning-fast, zero-dependency RBAC library for TypeScript/JavaScript with about one hundred million permission checks per second",
+      "description": "Lightning-fast, zero-dependency RBAC library for TypeScript/JavaScript with up to 10 million permission checks per second",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Cross-platform",
       "offers": {

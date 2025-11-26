@@ -268,7 +268,7 @@ rbac.hasPermission(user, 'tenant:456:users:read'); // false
 The bit-based permission system is highly optimized:
 
 - **Permission Check**: O(1) - Single bitwise AND operation
-- **Throughput**: about one hundred million ops/sec for exact matches
+- **Throughput**: up to 10 million ops/sec for exact matches
 - **Memory**: ~1 MB for 10,000 users with bit-based system
 
 **See:** [Performance Guide](./docs/PERFORMANCE.md) for detailed benchmarks and optimization tips.
