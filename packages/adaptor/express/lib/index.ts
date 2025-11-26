@@ -307,3 +307,90 @@ export class ExpressRBACAdapter {
     });
   }
 }
+
+/**
+ * Middleware to deny permission for a user
+ * Usage: app.post('/admin', denyPermission('admin:delete', options), handler)
+ */
+export function denyPermission(permission: string, options: ExpressRBACOptions) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await (options.getUser?.(req) || req.user);
+
+      if (!user) {
+        return options.onUnauthorized?.({
+          allowed: false,
+          reason: 'No user found in request',
+        }, req, res, next);
+      }
+
+      options.rbac.denyPermission(user.id, permission);
+      next();
+    } catch (error) {
+      options.onError?.(error as Error, req, res, next);
+    }
+  };
+}
+
+/**
+ * Middleware to allow (remove deny) permission for a user
+ */
+export function allowPermission(permission: string, options: ExpressRBACOptions) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await (options.getUser?.(req) || req.user);
+
+      if (!user) {
+        return options.onUnauthorized?.({
+          allowed: false,
+          reason: 'No user found in request',
+        }, req, res, next);
+      }
+
+      options.rbac.allowPermission(user.id, permission);
+      next();
+    } catch (error) {
+      options.onError?.(error as Error, req, res, next);
+    }
+  };
+}
+
+/**
+ * Middleware to check if permission is NOT denied
+ * Blocks request if permission is denied
+ */
+export function requireNotDenied(permission: string, options: ExpressRBACOptions) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await (options.getUser?.(req) || req.user);
+
+      if (!user) {
+        return options.onUnauthorized?.({
+          allowed: false,
+          reason: 'No user found in request',
+        }, req, res, next);
+      }
+
+      const deniedPermissions = options.rbac.getDeniedPermissions(user.id);
+      const isDenied = deniedPermissions.some((denied) => {
+        if (denied === permission) return true;
+        if (denied.includes('*')) {
+          const pattern = denied.replace(/\*/g, '.*');
+          return new RegExp(`^${pattern}$`).test(permission);
+        }
+        return false;
+      });
+
+      if (isDenied) {
+        return options.onUnauthorized?.({
+          allowed: false,
+          reason: `Permission "${permission}" is explicitly denied`,
+        }, req, res, next);
+      }
+
+      next();
+    } catch (error) {
+      options.onError?.(error as Error, req, res, next);
+    }
+  };
+}
