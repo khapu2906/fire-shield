@@ -1,4 +1,4 @@
-import { writable, derived, type Readable, type Writable } from 'svelte/store';
+import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
 import { RBAC, type RBACUser, type AuthorizationResult } from '@fire-shield/core';
 
 /**
@@ -12,6 +12,10 @@ export interface SvelteRBACStore {
   authorize: (permission: string) => Readable<AuthorizationResult>;
   canAll: (permissions: string[]) => Readable<boolean>;
   canAny: (permissions: string[]) => Readable<boolean>;
+  denyPermission: (permission: string) => void;
+  allowPermission: (permission: string) => void;
+  getDeniedPermissions: () => Readable<string[]>;
+  isDenied: (permission: string) => Readable<boolean>;
 }
 
 /**
@@ -19,6 +23,7 @@ export interface SvelteRBACStore {
  */
 export function createRBACStore(rbac: RBAC, initialUser: RBACUser | null = null): SvelteRBACStore {
   const user = writable<RBACUser | null>(initialUser);
+  const deniedTrigger = writable(0);
 
   return {
     rbac,
@@ -61,6 +66,50 @@ export function createRBACStore(rbac: RBAC, initialUser: RBACUser | null = null)
       return derived(user, ($user) => {
         if (!$user) return false;
         return permissions.some((permission) => rbac.hasPermission($user, permission));
+      });
+    },
+
+    denyPermission: (permission: string) => {
+      const currentUser = get(user);
+
+      if (!currentUser) {
+        throw new Error('Cannot deny permission: No user found');
+      }
+
+      rbac.denyPermission(currentUser.id, permission);
+      deniedTrigger.update((n) => n + 1);
+    },
+
+    allowPermission: (permission: string) => {
+      const currentUser = get(user);
+
+      if (!currentUser) {
+        throw new Error('Cannot allow permission: No user found');
+      }
+
+      rbac.allowPermission(currentUser.id, permission);
+      deniedTrigger.update((n) => n + 1);
+    },
+
+    getDeniedPermissions: () => {
+      return derived([user, deniedTrigger], ([$user]) => {
+        if (!$user) return [];
+        return rbac.getDeniedPermissions($user.id);
+      });
+    },
+
+    isDenied: (permission: string) => {
+      return derived([user, deniedTrigger], ([$user]) => {
+        if (!$user) return false;
+        const deniedPermissions = rbac.getDeniedPermissions($user.id);
+        return deniedPermissions.some((denied) => {
+          if (denied === permission) return true;
+          if (denied.includes('*')) {
+            const pattern = denied.replace(/\*/g, '.*');
+            return new RegExp(`^${pattern}$`).test(permission);
+          }
+          return false;
+        });
       });
     },
   };
@@ -190,6 +239,80 @@ export function cannot(node: HTMLElement, params: string | { permission: string;
 
   const unsubscribe = canStore.subscribe((allowed) => {
     if (allowed) {
+      if (hide) {
+        node.style.display = 'none';
+      } else {
+        node.remove();
+      }
+    } else {
+      if (hide) {
+        node.style.display = '';
+      }
+    }
+  });
+
+  return {
+    destroy() {
+      unsubscribe();
+    },
+  };
+}
+
+/**
+ * Svelte Action for conditional rendering when permission is denied
+ *
+ * Usage:
+ * <div use:denied={{ permission: 'admin:delete', store }}>This shows when denied</div>
+ */
+export function denied(node: HTMLElement, params: { permission: string; hide?: boolean; store: SvelteRBACStore }) {
+  const { permission, hide = false, store } = params;
+
+  if (!store) {
+    console.error('[Fire Shield] Svelte action "denied" requires a store parameter');
+    return {};
+  }
+
+  const isDeniedStore = store.isDenied(permission);
+
+  const unsubscribe = isDeniedStore.subscribe((isDenied) => {
+    if (!isDenied) {
+      if (hide) {
+        node.style.display = 'none';
+      } else {
+        node.remove();
+      }
+    } else {
+      if (hide) {
+        node.style.display = '';
+      }
+    }
+  });
+
+  return {
+    destroy() {
+      unsubscribe();
+    },
+  };
+}
+
+/**
+ * Svelte Action for conditional rendering when permission is NOT denied
+ *
+ * Usage:
+ * <div use:notDenied={{ permission: 'admin:delete', store }}>This shows when not denied</div>
+ */
+export function notDenied(node: HTMLElement, params: { permission: string; hide?: boolean; store: SvelteRBACStore }) {
+  const { permission, hide = false, store } = params;
+
+  if (!store) {
+    console.error('[Fire Shield] Svelte action "notDenied" requires a store parameter');
+    return {};
+  }
+
+  const isDeniedStore = store.isDenied(permission);
+
+  const unsubscribe = isDeniedStore.subscribe((isDenied) => {
+    if (isDenied) {
       if (hide) {
         node.style.display = 'none';
       } else {
