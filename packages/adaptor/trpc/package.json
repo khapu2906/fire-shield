@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/trpc",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "tRPC adapter for Fire Shield RBAC with type-safe middleware",
   "type": "module",
   "main": "./dist/index.js",
@@ -31,7 +31,7 @@
     "middleware",
     "type-safe"
   ],
-  "author": "KentPhung92",
+  "author": "khapu2906",
   "license": "DIB",
   "dependencies": {
     "@fire-shield/core": "2.2.0"

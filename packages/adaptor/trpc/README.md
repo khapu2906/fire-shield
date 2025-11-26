@@ -424,4 +424,4 @@ app.use(
 
 ## License
 
-MIT © KentPhung92
+DIB © khapu2906
