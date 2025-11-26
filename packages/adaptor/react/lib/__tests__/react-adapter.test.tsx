@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import { RBAC } from '@fire-shield/core';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
@@ -19,7 +19,13 @@ import {
   useAuthorize,
   Can,
   Cannot,
-  ProtectedRoute
+  ProtectedRoute,
+  useDenyPermission,
+  useAllowPermission,
+  useDeniedPermissions,
+  useIsDenied,
+  Denied,
+  NotDenied
 } from '../index';
 
 // Helper component to test hooks
@@ -239,6 +245,279 @@ describe('React RBAC Adapter', () => {
       );
 
       expect(screen.getByTestId('editor-route')).toBeInTheDocument();
+    });
+  });
+
+  describe('Deny Permissions', () => {
+    describe('useDenyPermission hook', () => {
+      it('should deny permission for current user', async () => {
+        function TestDeny() {
+          const denyPermission = useDenyPermission();
+          const hasPermission = usePermission('post:write');
+
+          return (
+            <div>
+              <div data-testid="has-permission">{hasPermission ? 'yes' : 'no'}</div>
+              <button onClick={() => denyPermission('post:write')}>Deny</button>
+            </div>
+          );
+        }
+
+        const { getByText } = render(
+          <RBACProvider rbac={rbac} user={user}>
+            <TestDeny />
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('has-permission')).toHaveTextContent('yes');
+
+        getByText('Deny').click();
+
+        // After deny, permission should be revoked
+        await waitFor(() => {
+          expect(screen.getByTestId('has-permission')).toHaveTextContent('no');
+        });
+      });
+
+      it('should throw error when no user', () => {
+        function TestDenyNoUser() {
+          const denyPermission = useDenyPermission();
+
+          return (
+            <button onClick={() => denyPermission('post:write')}>Deny</button>
+          );
+        }
+
+        const { getByText } = render(
+          <RBACProvider rbac={rbac} user={null}>
+            <TestDenyNoUser />
+          </RBACProvider>
+        );
+
+        expect(() => getByText('Deny').click()).toThrow('Cannot deny permission: No user found');
+      });
+    });
+
+    describe('useAllowPermission hook', () => {
+      it('should remove denied permission', async () => {
+        // First deny the permission
+        rbac.denyPermission(user.id, 'post:write');
+
+        function TestAllow() {
+          const allowPermission = useAllowPermission();
+          const hasPermission = usePermission('post:write');
+
+          return (
+            <div>
+              <div data-testid="has-permission">{hasPermission ? 'yes' : 'no'}</div>
+              <button onClick={() => allowPermission('post:write')}>Allow</button>
+            </div>
+          );
+        }
+
+        const { getByText } = render(
+          <RBACProvider rbac={rbac} user={user}>
+            <TestAllow />
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('has-permission')).toHaveTextContent('no');
+
+        getByText('Allow').click();
+
+        // After allow, permission should be granted again
+        await waitFor(() => {
+          expect(screen.getByTestId('has-permission')).toHaveTextContent('yes');
+        });
+      });
+    });
+
+    describe('useDeniedPermissions hook', () => {
+      it('should return array of denied permissions', () => {
+        rbac.denyPermission(user.id, 'post:delete');
+        rbac.denyPermission(user.id, 'user:*');
+
+        function TestDeniedList() {
+          const deniedPermissions = useDeniedPermissions();
+
+          return (
+            <div data-testid="denied-list">
+              {deniedPermissions.join(', ')}
+            </div>
+          );
+        }
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <TestDeniedList />
+          </RBACProvider>
+        );
+
+        const deniedList = screen.getByTestId('denied-list').textContent;
+        expect(deniedList).toContain('post:delete');
+        expect(deniedList).toContain('user:*');
+      });
+
+      it('should return empty array when no user', () => {
+        function TestDeniedListNoUser() {
+          const deniedPermissions = useDeniedPermissions();
+
+          return (
+            <div data-testid="denied-count">{deniedPermissions.length}</div>
+          );
+        }
+
+        render(
+          <RBACProvider rbac={rbac} user={null}>
+            <TestDeniedListNoUser />
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('denied-count')).toHaveTextContent('0');
+      });
+    });
+
+    describe('useIsDenied hook', () => {
+      it('should return true for denied permission', () => {
+        rbac.denyPermission(user.id, 'post:delete');
+
+        function TestIsDenied() {
+          const isDenied = useIsDenied('post:delete');
+
+          return (
+            <div data-testid="is-denied">{isDenied ? 'yes' : 'no'}</div>
+          );
+        }
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <TestIsDenied />
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('is-denied')).toHaveTextContent('yes');
+      });
+
+      it('should return false for non-denied permission', () => {
+        function TestIsNotDenied() {
+          const isDenied = useIsDenied('post:write');
+
+          return (
+            <div data-testid="is-denied">{isDenied ? 'yes' : 'no'}</div>
+          );
+        }
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <TestIsNotDenied />
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('is-denied')).toHaveTextContent('no');
+      });
+
+      it('should match wildcard denied permissions', () => {
+        rbac.denyPermission(user.id, 'user:*');
+
+        function TestWildcardDenied() {
+          const isDeniedDelete = useIsDenied('user:delete');
+          const isDeniedUpdate = useIsDenied('user:update');
+
+          return (
+            <div>
+              <div data-testid="denied-delete">{isDeniedDelete ? 'yes' : 'no'}</div>
+              <div data-testid="denied-update">{isDeniedUpdate ? 'yes' : 'no'}</div>
+            </div>
+          );
+        }
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <TestWildcardDenied />
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('denied-delete')).toHaveTextContent('yes');
+        expect(screen.getByTestId('denied-update')).toHaveTextContent('yes');
+      });
+    });
+
+    describe('Denied component', () => {
+      it('should render children when permission is denied', () => {
+        rbac.denyPermission(user.id, 'post:delete');
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <Denied permission="post:delete">
+              <div data-testid="denied-content">You are denied</div>
+            </Denied>
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('denied-content')).toBeInTheDocument();
+      });
+
+      it('should render fallback when permission is not denied', () => {
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <Denied
+              permission="post:delete"
+              fallback={<div data-testid="not-denied">You are allowed</div>}
+            >
+              <div data-testid="denied-content">You are denied</div>
+            </Denied>
+          </RBACProvider>
+        );
+
+        expect(screen.queryByTestId('denied-content')).not.toBeInTheDocument();
+        expect(screen.getByTestId('not-denied')).toBeInTheDocument();
+      });
+
+      it('should work with wildcard denies', () => {
+        rbac.denyPermission(user.id, 'admin:*');
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <Denied permission="admin:delete">
+              <div data-testid="denied-admin">Admin denied</div>
+            </Denied>
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('denied-admin')).toBeInTheDocument();
+      });
+    });
+
+    describe('NotDenied component', () => {
+      it('should render children when permission is not denied', () => {
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <NotDenied permission="post:write">
+              <div data-testid="allowed-content">You can write</div>
+            </NotDenied>
+          </RBACProvider>
+        );
+
+        expect(screen.getByTestId('allowed-content')).toBeInTheDocument();
+      });
+
+      it('should render fallback when permission is denied', () => {
+        rbac.denyPermission(user.id, 'post:delete');
+
+        render(
+          <RBACProvider rbac={rbac} user={user}>
+            <NotDenied
+              permission="post:delete"
+              fallback={<div data-testid="denied-fallback">Denied</div>}
+            >
+              <div data-testid="allowed-content">You can delete</div>
+            </NotDenied>
+          </RBACProvider>
+        );
+
+        expect(screen.queryByTestId('allowed-content')).not.toBeInTheDocument();
+        expect(screen.getByTestId('denied-fallback')).toBeInTheDocument();
+      });
     });
   });
 });

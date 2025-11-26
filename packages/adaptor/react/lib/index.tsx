@@ -1,4 +1,4 @@
-import React, { createContext, useContext, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, type ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { RBAC, type RBACUser, type AuthorizationResult } from '@fire-shield/core';
 
@@ -8,6 +8,8 @@ import { RBAC, type RBACUser, type AuthorizationResult } from '@fire-shield/core
 interface RBACContextValue {
   rbac: RBAC;
   user: RBACUser | null;
+  deniedTrigger: number;
+  triggerDeniedUpdate: () => void;
 }
 
 const RBACContext = createContext<RBACContextValue | null>(null);
@@ -25,8 +27,21 @@ export interface RBACProviderProps {
  * RBAC Provider Component
  */
 export function RBACProvider({ rbac, user, children }: RBACProviderProps) {
+  const [deniedTrigger, setDeniedTrigger] = useState(0);
+
+  const triggerDeniedUpdate = useCallback(() => {
+    setDeniedTrigger(prev => prev + 1);
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    rbac,
+    user,
+    deniedTrigger,
+    triggerDeniedUpdate
+  }), [rbac, user, deniedTrigger, triggerDeniedUpdate]);
+
   return (
-    <RBACContext.Provider value={{ rbac, user }}>
+    <RBACContext.Provider value={contextValue}>
       {children}
     </RBACContext.Provider>
   );
@@ -63,10 +78,27 @@ export function usePermission(permission: string): boolean {
     throw new Error('usePermission must be used within RBACProvider');
   }
 
-  const { rbac, user } = context;
-  if (!user) return false;
+  const { rbac, user, deniedTrigger } = context;
 
-  return rbac.hasPermission(user, permission);
+  return useMemo(() => {
+    if (!user) return false;
+
+    // Check if permission is denied
+    const deniedPermissions = rbac.getDeniedPermissions(user.id);
+    const isDenied = deniedPermissions.some(denied => {
+      if (denied === permission) return true;
+      if (denied.includes('*')) {
+        const pattern = denied.replace(/\*/g, '.*');
+        return new RegExp(`^${pattern}$`).test(permission);
+      }
+      return false;
+    });
+
+    // If denied, return false regardless of whether user has the permission
+    if (isDenied) return false;
+
+    return rbac.hasPermission(user, permission);
+  }, [rbac, user, permission, deniedTrigger]);
 }
 
 /**
@@ -126,6 +158,82 @@ export function useAnyPermission(...permissions: string[]): boolean {
   if (!user) return false;
 
   return rbac.hasAnyPermission(user, permissions);
+}
+
+/**
+ * Use deny permission hook
+ * Returns a function to deny a permission for the current user
+ */
+export function useDenyPermission(): (permission: string) => void {
+  const context = useContext(RBACContext);
+  if (!context) {
+    throw new Error('useDenyPermission must be used within RBACProvider');
+  }
+
+  const { rbac, user, triggerDeniedUpdate } = context;
+
+  return useCallback((permission: string) => {
+    if (!user) {
+      throw new Error('Cannot deny permission: No user found');
+    }
+    rbac.denyPermission(user.id, permission);
+    triggerDeniedUpdate(); // Trigger re-render
+  }, [rbac, user, triggerDeniedUpdate]);
+}
+
+/**
+ * Use allow permission hook (remove deny)
+ * Returns a function to remove a denied permission for the current user
+ */
+export function useAllowPermission(): (permission: string) => void {
+  const context = useContext(RBACContext);
+  if (!context) {
+    throw new Error('useAllowPermission must be used within RBACProvider');
+  }
+
+  const { rbac, user, triggerDeniedUpdate } = context;
+
+  return useCallback((permission: string) => {
+    if (!user) {
+      throw new Error('Cannot allow permission: No user found');
+    }
+    rbac.allowPermission(user.id, permission);
+    triggerDeniedUpdate(); // Trigger re-render
+  }, [rbac, user, triggerDeniedUpdate]);
+}
+
+/**
+ * Use denied permissions hook
+ * Returns array of denied permissions for the current user
+ */
+export function useDeniedPermissions(): string[] {
+  const context = useContext(RBACContext);
+  if (!context) {
+    throw new Error('useDeniedPermissions must be used within RBACProvider');
+  }
+
+  const { rbac, user } = context;
+  if (!user) return [];
+
+  return rbac.getDeniedPermissions(user.id);
+}
+
+/**
+ * Check if user has a denied permission
+ */
+export function useIsDenied(permission: string): boolean {
+  const deniedPermissions = useDeniedPermissions();
+  const { rbac } = useContext(RBACContext)!;
+
+  // Check exact match or wildcard match
+  return deniedPermissions.some(denied => {
+    if (denied === permission) return true;
+    if (denied.includes('*')) {
+      const pattern = denied.replace(/\*/g, '.*');
+      return new RegExp(`^${pattern}$`).test(permission);
+    }
+    return false;
+  });
 }
 
 /**
@@ -246,4 +354,41 @@ export function RequirePermission({ permission, children }: RequirePermissionPro
   }
 
   return <>{children}</>;
+}
+
+/**
+ * Denied Component Props
+ */
+export interface DeniedProps {
+  permission: string;
+  fallback?: ReactNode;
+  children: ReactNode;
+}
+
+/**
+ * Denied Component - Render if user is explicitly denied permission
+ * Shows children if denied, shows fallback if not denied
+ */
+export function Denied({ permission, fallback, children }: DeniedProps) {
+  const isDenied = useIsDenied(permission);
+
+  if (isDenied) {
+    return <>{children}</>;
+  }
+
+  return fallback ? <>{fallback}</> : null;
+}
+
+/**
+ * NotDenied Component - Render if user is NOT denied permission
+ * Opposite of Denied component
+ */
+export function NotDenied({ permission, fallback, children }: DeniedProps) {
+  const isDenied = useIsDenied(permission);
+
+  if (!isDenied) {
+    return <>{children}</>;
+  }
+
+  return fallback ? <>{fallback}</> : null;
 }

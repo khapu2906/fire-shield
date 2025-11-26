@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/react",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "React adapter for RBAC with hooks, components, and route guards",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.1.1"
+    "@fire-shield/core": "^2.2.0"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
