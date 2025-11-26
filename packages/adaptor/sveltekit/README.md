@@ -400,8 +400,8 @@ export const load: PageServerLoad = async (event: RBACEvent) => {
 
 ## License
 
-MIT
+DIB
 
 ## Repository
 
-[Fire Shield RBAC Monorepo](https://github.com/khapu2960/RBAC)
+[Fire Shield RBAC Monorepo](https://github.com/khapu2906/RBAC)

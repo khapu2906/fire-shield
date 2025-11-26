@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/sveltekit",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "SvelteKit adapter for Fire Shield RBAC - Server-side hooks and page guards",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,7 +37,7 @@
   "license": "DIB",
   "repository": {
     "type": "git",
-    "url": "https://github.com/khapu2960/RBAC.git",
+    "url": "https://github.com/khapu2906/RBAC.git",
     "directory": "packages/adaptor/sveltekit"
   },
   "dependencies": {
