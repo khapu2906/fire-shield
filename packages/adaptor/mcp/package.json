@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/mcp",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Model Context Protocol (MCP) adapter for Fire Shield RBAC - AI agent integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,7 +37,7 @@
   "license": "DIB",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KentPhung92/RBAC.git",
+    "url": "https://github.com/khapu2906/RBAC.git",
     "directory": "packages/adaptor/mcp"
   },
   "dependencies": {

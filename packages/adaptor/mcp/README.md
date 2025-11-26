@@ -330,8 +330,8 @@ const server: FireShieldMCPServer = await createMCPServer(options);
 
 ## License
 
-MIT
+DIB
 
 ## Repository
 
-[Fire Shield RBAC Monorepo](https://github.com/KentPhung92/RBAC)
+[Fire Shield RBAC Monorepo](https://github.com/khapu2906/RBAC)
