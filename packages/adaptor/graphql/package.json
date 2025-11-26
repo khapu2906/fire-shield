@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/graphql",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "GraphQL adapter for Fire Shield RBAC with directives and middleware",
   "type": "module",
   "main": "./dist/index.js",
@@ -30,7 +30,7 @@
     "fire-shield",
     "directives"
   ],
-  "author": "KentPhung92",
+  "author": "khapu2906",
   "license": "DIB",
   "dependencies": {
     "@fire-shield/core": "^2.2.0"

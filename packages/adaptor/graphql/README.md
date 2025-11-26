@@ -324,4 +324,4 @@ app.use('/graphql', createHandler({
 
 ## License
 
-MIT © KentPhung92
+DIB © khapu2906
