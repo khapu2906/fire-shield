@@ -1,17 +1,17 @@
 {
   "name": "@fire-shield/react-native",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "React Native adapter for Fire Shield RBAC with hooks and components",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "react-native": "./dist/index.mjs",
+  "react-native": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
