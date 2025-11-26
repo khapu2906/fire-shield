@@ -325,6 +325,51 @@ export class FastifyRBACAdapter {
   }
 
   /**
+   * Create hook to deny a permission
+   */
+  denyPermission(permission: string): preHandlerHookHandler {
+    return denyPermission(permission, this.options);
+  }
+
+  /**
+   * Create hook to allow (remove deny) a permission
+   */
+  allowPermission(permission: string): preHandlerHookHandler {
+    return allowPermission(permission, this.options);
+  }
+
+  /**
+   * Create hook to block if permission is denied
+   */
+  notDenied(permission: string): preHandlerHookHandler {
+    return requireNotDenied(permission, this.options);
+  }
+
+  /**
+   * Get denied permissions for a user from request
+   */
+  getDeniedPermissions(request: FastifyRequest): string[] {
+    const user = request.user;
+    if (!user) return [];
+    return this.rbac.getDeniedPermissions(user.id);
+  }
+
+  /**
+   * Check if a permission is denied for user from request
+   */
+  isDenied(request: FastifyRequest, permission: string): boolean {
+    const deniedPermissions = this.getDeniedPermissions(request);
+    return deniedPermissions.some((denied) => {
+      if (denied === permission) return true;
+      if (denied.includes('*')) {
+        const pattern = denied.replace(/\*/g, '.*');
+        return new RegExp(`^${pattern}$`).test(permission);
+      }
+      return false;
+    });
+  }
+
+  /**
    * Register RBAC with Fastify instance
    */
   register(fastify: any, opts: Partial<FastifyRBACOptions> = {}, done: () => void) {
@@ -348,6 +393,110 @@ export function fastifyRBACPlugin(rbac: RBAC, options: Partial<FastifyRBACOption
 
   return function (fastify: any, opts: any, done: () => void) {
     adapter.register(fastify, opts, done);
+  };
+}
+
+/**
+ * Hook to deny permission for a user
+ * Usage: fastify.addHook('preHandler', denyPermission('admin:delete', options))
+ */
+export function denyPermission(permission: string, options: FastifyRBACOptions): preHandlerHookHandler {
+  const {
+    getUser = defaultGetUser,
+    onError = defaultOnError,
+  } = options;
+
+  return async function denyPermissionHook(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction): Promise<void> {
+    try {
+      const user = await Promise.resolve(getUser(request));
+
+      if (!user) {
+        onError(new Error('No user found in request'), request, reply);
+        return;
+      }
+
+      options.rbac.denyPermission(user.id, permission);
+      done();
+    } catch (error) {
+      onError(error as Error, request, reply);
+    }
+  };
+}
+
+/**
+ * Hook to allow (remove deny) permission for a user
+ */
+export function allowPermission(permission: string, options: FastifyRBACOptions): preHandlerHookHandler {
+  const {
+    getUser = defaultGetUser,
+    onError = defaultOnError,
+  } = options;
+
+  return async function allowPermissionHook(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction): Promise<void> {
+    try {
+      const user = await Promise.resolve(getUser(request));
+
+      if (!user) {
+        onError(new Error('No user found in request'), request, reply);
+        return;
+      }
+
+      options.rbac.allowPermission(user.id, permission);
+      done();
+    } catch (error) {
+      onError(error as Error, request, reply);
+    }
+  };
+}
+
+/**
+ * Hook to check if permission is NOT denied
+ * Blocks request if permission is denied
+ */
+export function requireNotDenied(permission: string, options: FastifyRBACOptions): preHandlerHookHandler {
+  const {
+    getUser = defaultGetUser,
+    onUnauthorized = defaultOnUnauthorized,
+    onError = defaultOnError,
+  } = options;
+
+  return async function requireNotDeniedHook(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction): Promise<void> {
+    try {
+      const user = await Promise.resolve(getUser(request));
+
+      if (!user) {
+        const result: AuthorizationResult = {
+          allowed: false,
+          reason: 'No user found in request'
+        };
+        onUnauthorized(result, request, reply);
+        return;
+      }
+
+      const deniedPermissions = options.rbac.getDeniedPermissions(user.id);
+      const isDenied = deniedPermissions.some((denied) => {
+        if (denied === permission) return true;
+        if (denied.includes('*')) {
+          const pattern = denied.replace(/\*/g, '.*');
+          return new RegExp(`^${pattern}$`).test(permission);
+        }
+        return false;
+      });
+
+      if (isDenied) {
+        const result: AuthorizationResult = {
+          allowed: false,
+          reason: `Permission "${permission}" is explicitly denied`,
+          user
+        };
+        onUnauthorized(result, request, reply);
+        return;
+      }
+
+      done();
+    } catch (error) {
+      onError(error as Error, request, reply);
+    }
   };
 }
 
