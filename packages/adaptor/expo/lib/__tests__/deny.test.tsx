@@ -2,7 +2,7 @@
  * Expo Deny Permissions Tests
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import { RBAC } from '@fire-shield/core';
 import {
   RBACProvider,

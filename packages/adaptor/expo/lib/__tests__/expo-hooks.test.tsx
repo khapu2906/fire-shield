@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePersistedUser, useRBACDebug } from '../index';
 
 // Mock AsyncStorage
@@ -30,20 +30,24 @@ describe('Expo-specific Hooks', () => {
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedUser));
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current[0]).toEqual(storedUser);
+      });
 
-      expect(result.current[0]).toEqual(storedUser);
       expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('@fire-shield:user');
     });
 
     it('should return undefined when no stored user', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      // Wait for initial load (even if undefined)
+      await waitFor(() => {
+        expect(mockAsyncStorage.getItem).toHaveBeenCalled();
+      });
 
       expect(result.current[0]).toBeUndefined();
     });
@@ -52,9 +56,9 @@ describe('Expo-specific Hooks', () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
       mockAsyncStorage.setItem.mockResolvedValue(undefined);
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      await waitFor(() => { expect(mockAsyncStorage.getItem).toHaveBeenCalled(); });
 
       const newUser = {
         id: 'user2',
@@ -81,9 +85,9 @@ describe('Expo-specific Hooks', () => {
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedUser));
       mockAsyncStorage.removeItem.mockResolvedValue(undefined);
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      await waitFor(() => { expect(mockAsyncStorage.getItem).toHaveBeenCalled(); });
 
       expect(result.current[0]).toEqual(storedUser);
 
@@ -99,9 +103,9 @@ describe('Expo-specific Hooks', () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
 
       const customKey = '@myapp:current-user';
-      const { waitForNextUpdate } = renderHook(() => usePersistedUser(customKey));
+      const { result } = renderHook(() => usePersistedUser(customKey));
 
-      await waitForNextUpdate();
+      await waitFor(() => { expect(mockAsyncStorage.getItem).toHaveBeenCalled(); });
 
       expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(customKey);
     });
@@ -111,9 +115,9 @@ describe('Expo-specific Hooks', () => {
 
       const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      await waitFor(() => { expect(mockAsyncStorage.getItem).toHaveBeenCalled(); });
 
       expect(result.current[0]).toBeUndefined();
       expect(consoleWarn).toHaveBeenCalledWith(
@@ -130,9 +134,9 @@ describe('Expo-specific Hooks', () => {
 
       const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      await waitFor(() => { expect(mockAsyncStorage.getItem).toHaveBeenCalled(); });
 
       const newUser = { id: 'user1', roles: ['viewer'] };
 
@@ -204,9 +208,9 @@ describe('Expo-specific Hooks', () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
       mockAsyncStorage.setItem.mockResolvedValue(undefined);
 
-      const { result, waitForNextUpdate } = renderHook(() => usePersistedUser());
+      const { result } = renderHook(() => usePersistedUser());
 
-      await waitForNextUpdate();
+      await waitFor(() => { expect(mockAsyncStorage.getItem).toHaveBeenCalled(); });
 
       // Set first user
       await act(async () => {
