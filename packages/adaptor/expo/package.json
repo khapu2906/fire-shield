@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/expo",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Expo adapter for Fire Shield RBAC optimized for managed workflow",
   "type": "module",
   "main": "./dist/index.js",
@@ -38,7 +38,7 @@
   "license": "DIB",
   "dependencies": {
     "@fire-shield/core": "^2.2.0",
-    "@fire-shield/react-native": "^2.2.1"
+    "@fire-shield/react-native": "^2.2.2"
   },
   "peerDependencies": {
     "expo": ">=49.0.0",
