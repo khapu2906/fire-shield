@@ -305,4 +305,102 @@ export class HonoRBACAdapter {
       }
     };
   }
+
+  /**
+   * Create middleware to deny a permission
+   */
+  denyPermission(permission: string): MiddlewareHandler {
+    return async (c, next) => {
+      try {
+        const user = await this.options.getUser(c);
+
+        if (!user) {
+          return this.options.onError(new Error('No user found in context'), c);
+        }
+
+        this.rbac.denyPermission(user.id, permission);
+        await next();
+      } catch (error) {
+        return this.options.onError(error as Error, c);
+      }
+    };
+  }
+
+  /**
+   * Create middleware to allow (remove deny) a permission
+   */
+  allowPermission(permission: string): MiddlewareHandler {
+    return async (c, next) => {
+      try {
+        const user = await this.options.getUser(c);
+
+        if (!user) {
+          return this.options.onError(new Error('No user found in context'), c);
+        }
+
+        this.rbac.allowPermission(user.id, permission);
+        await next();
+      } catch (error) {
+        return this.options.onError(error as Error, c);
+      }
+    };
+  }
+
+  /**
+   * Create middleware to block if permission is denied
+   */
+  notDenied(permission: string): MiddlewareHandler {
+    return async (c, next) => {
+      try {
+        const user = await this.options.getUser(c);
+
+        if (!user) {
+          const result: AuthorizationResult = {
+            allowed: false,
+            reason: 'No user found in context'
+          };
+          return this.options.onUnauthorized(result, c);
+        }
+
+        const isDenied = this.isDenied(c, permission);
+
+        if (isDenied) {
+          const result: AuthorizationResult = {
+            allowed: false,
+            reason: `Permission "${permission}" is explicitly denied`,
+            user
+          };
+          return this.options.onUnauthorized(result, c);
+        }
+
+        await next();
+      } catch (error) {
+        return this.options.onError(error as Error, c);
+      }
+    };
+  }
+
+  /**
+   * Get denied permissions for user from context
+   */
+  getDeniedPermissions(c: Context): string[] {
+    const user = c.get('user') as RBACUser | undefined;
+    if (!user) return [];
+    return this.rbac.getDeniedPermissions(user.id);
+  }
+
+  /**
+   * Check if a permission is denied for user from context
+   */
+  isDenied(c: Context, permission: string): boolean {
+    const deniedPermissions = this.getDeniedPermissions(c);
+    return deniedPermissions.some((denied) => {
+      if (denied === permission) return true;
+      if (denied.includes('*')) {
+        const pattern = denied.replace(/\*/g, '.*');
+        return new RegExp(`^${pattern}$`).test(permission);
+      }
+      return false;
+    });
+  }
 }
