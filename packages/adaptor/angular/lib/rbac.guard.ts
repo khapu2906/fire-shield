@@ -151,3 +151,37 @@ export const canActivateRBAC: CanActivateFn = (
 
   return true;
 };
+
+/**
+ * Functional guard to block routes when permission is denied
+ *
+ * Usage in routes:
+ * {
+ *   path: 'sensitive',
+ *   component: SensitiveComponent,
+ *   canActivate: [canActivateNotDenied],
+ *   data: { permission: 'admin:delete' }
+ * }
+ */
+export const canActivateNotDenied: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  const rbacService = inject(RBACService);
+  const router = inject(Router);
+  const data = route.data as RBACRouteData;
+
+  if (data.permission) {
+    const isDenied = rbacService.isDenied(data.permission);
+    if (isDenied) {
+      if (data.redirectTo) {
+        router.navigate([data.redirectTo]);
+      }
+      return false;
+    }
+    return true;
+  }
+
+  // No permission specified, allow access
+  return true;
+};

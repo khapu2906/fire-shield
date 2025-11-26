@@ -2,10 +2,10 @@
 export { RBACService } from './rbac.service';
 
 // Directives
-export { CanPermissionDirective, HasRoleDirective, CannotPermissionDirective } from './can.directive';
+export { CanPermissionDirective, HasRoleDirective, CannotPermissionDirective, DeniedDirective, NotDeniedDirective } from './can.directive';
 
 // Guards
-export { canActivatePermission, canActivateRole, canActivateRBAC, type RBACRouteData } from './rbac.guard';
+export { canActivatePermission, canActivateRole, canActivateRBAC, canActivateNotDenied, type RBACRouteData } from './rbac.guard';
 
 // Re-export core types
 export type { RBACUser, AuthorizationResult } from '@fire-shield/core';

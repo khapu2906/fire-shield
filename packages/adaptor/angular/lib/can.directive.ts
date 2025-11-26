@@ -118,3 +118,81 @@ export class CannotPermissionDirective implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 }
+
+/**
+ * Structural directive to conditionally render content when permission is denied
+ *
+ * Usage:
+ * <div *fsDenied="'admin:delete'">This action is denied</div>
+ */
+@Directive({
+  selector: '[fsDenied]',
+  standalone: true
+})
+export class DeniedDirective implements OnInit, OnDestroy {
+  @Input() fsDenied!: string;
+
+  private subscription?: Subscription;
+  private hasView = false;
+
+  constructor(
+    private templateRef: TemplateRef<any>,
+    private viewContainer: ViewContainerRef,
+    private rbacService: RBACService
+  ) {}
+
+  ngOnInit(): void {
+    this.subscription = this.rbacService.isDenied$(this.fsDenied).subscribe(isDenied => {
+      if (isDenied && !this.hasView) {
+        this.viewContainer.createEmbeddedView(this.templateRef);
+        this.hasView = true;
+      } else if (!isDenied && this.hasView) {
+        this.viewContainer.clear();
+        this.hasView = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+}
+
+/**
+ * Structural directive to conditionally render content when permission is NOT denied
+ *
+ * Usage:
+ * <div *fsNotDenied="'admin:delete'">This action is allowed</div>
+ */
+@Directive({
+  selector: '[fsNotDenied]',
+  standalone: true
+})
+export class NotDeniedDirective implements OnInit, OnDestroy {
+  @Input() fsNotDenied!: string;
+
+  private subscription?: Subscription;
+  private hasView = false;
+
+  constructor(
+    private templateRef: TemplateRef<any>,
+    private viewContainer: ViewContainerRef,
+    private rbacService: RBACService
+  ) {}
+
+  ngOnInit(): void {
+    this.subscription = this.rbacService.isDenied$(this.fsNotDenied).subscribe(isDenied => {
+      if (!isDenied && !this.hasView) {
+        this.viewContainer.createEmbeddedView(this.templateRef);
+        this.hasView = true;
+      } else if (isDenied && this.hasView) {
+        this.viewContainer.clear();
+        this.hasView = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+}
