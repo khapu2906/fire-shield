@@ -1,0 +1,49 @@
+{
+  "name": "@fire-shield/cli",
+  "version": "2.2.0",
+  "description": "Fire Shield RBAC CLI tool for validation and permission management",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "fire-shield": "./bin/fire-shield.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest"
+  },
+  "keywords": [
+    "rbac",
+    "access-control",
+    "permissions",
+    "cli",
+    "fire-shield"
+  ],
+  "author": "khapu2906",
+  "license": "DIB",
+  "dependencies": {
+    "@fire-shield/core": "*",
+    "commander": "^12.1.0",
+    "chalk": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.1"
+  }
+}
