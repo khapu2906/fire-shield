@@ -216,6 +216,115 @@ export class NuxtRBACAdapter {
   getRBAC(): RBAC {
     return this.rbac;
   }
+
+  /**
+   * Deny permission for a user
+   */
+  async denyPermission(event: H3Event, permission: string): Promise<void> {
+    let user: RBACUser | undefined;
+
+    try {
+      user = await this.options.getUser(event);
+    } catch (error) {
+      return this.options.onError(error as Error, event);
+    }
+
+    if (!user) {
+      const result: AuthorizationResult = {
+        allowed: false,
+        reason: 'No user found in context',
+      };
+      this.options.onUnauthorized(result, event);
+      return;
+    }
+
+    this.rbac.denyPermission(user.id, permission);
+  }
+
+  /**
+   * Allow (remove deny) permission for a user
+   */
+  async allowPermission(event: H3Event, permission: string): Promise<void> {
+    let user: RBACUser | undefined;
+
+    try {
+      user = await this.options.getUser(event);
+    } catch (error) {
+      return this.options.onError(error as Error, event);
+    }
+
+    if (!user) {
+      const result: AuthorizationResult = {
+        allowed: false,
+        reason: 'No user found in context',
+      };
+      this.options.onUnauthorized(result, event);
+      return;
+    }
+
+    this.rbac.allowPermission(user.id, permission);
+  }
+
+  /**
+   * Get denied permissions for a user
+   */
+  async getDeniedPermissions(event: H3Event): Promise<string[]> {
+    let user: RBACUser | undefined;
+
+    try {
+      user = await this.options.getUser(event);
+    } catch (error) {
+      return [];
+    }
+
+    if (!user) {
+      return [];
+    }
+
+    return this.rbac.getDeniedPermissions(user.id);
+  }
+
+  /**
+   * Require permission is NOT denied - throws if denied
+   */
+  async requireNotDenied(event: H3Event, permission: string): Promise<void> {
+    let user: RBACUser | undefined;
+
+    try {
+      user = await this.options.getUser(event);
+    } catch (error) {
+      return this.options.onError(error as Error, event);
+    }
+
+    if (!user) {
+      const result: AuthorizationResult = {
+        allowed: false,
+        reason: 'No user found in context',
+      };
+      this.options.onUnauthorized(result, event);
+      return;
+    }
+
+    const deniedPermissions = this.rbac.getDeniedPermissions(user.id);
+    const isDenied = deniedPermissions.some((denied) => {
+      if (denied === permission) return true;
+      if (denied.includes('*')) {
+        const pattern = denied.replace(/\*/g, '.*');
+        return new RegExp(`^${pattern}$`).test(permission);
+      }
+      return false;
+    });
+
+    if (isDenied) {
+      const result: AuthorizationResult = {
+        allowed: false,
+        reason: `Permission "${permission}" is explicitly denied`,
+        user,
+      };
+      this.options.onUnauthorized(result, event);
+      return;
+    }
+  }
 }
 
 /**
