@@ -1,0 +1,50 @@
+{
+  "name": "@fire-shield/graphql",
+  "version": "2.2.0",
+  "description": "GraphQL adapter for Fire Shield RBAC with directives and middleware",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest"
+  },
+  "keywords": [
+    "rbac",
+    "graphql",
+    "access-control",
+    "permissions",
+    "fire-shield",
+    "directives"
+  ],
+  "author": "KentPhung92",
+  "license": "DIB",
+  "dependencies": {
+    "@fire-shield/core": "^2.2.0"
+  },
+  "peerDependencies": {
+    "graphql": "^16.0.0"
+  },
+  "devDependencies": {
+    "@graphql-tools/schema": "^10.0.0",
+    "@graphql-tools/utils": "^10.0.0",
+    "@types/node": "^22.5.1",
+    "graphql": "^16.8.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.1"
+  }
+}
