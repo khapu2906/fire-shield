@@ -65,7 +65,7 @@ export default defineConfig({
       },
       { text: 'Roadmap', link: '/roadmap' },
       {
-        text: 'v2.1',
+        text: 'v2.2',
         items: [
           { text: 'Changelog', link: 'https://github.com/khapu2906/fire-shield/releases' },
           { text: 'Contributing', link: 'https://github.com/khapu2906/fire-shield/blob/main/CONTRIBUTING.md' },
@@ -96,6 +96,7 @@ export default defineConfig({
           text: 'Advanced',
           items: [
             { text: 'Audit Logging', link: '/guide/audit-logging' },
+            { text: 'Deny Permissions', link: '/guide/deny-permissions' },
             { text: 'Performance', link: '/guide/performance' },
             { text: 'TypeScript', link: '/guide/typescript' },
           ]
@@ -122,6 +123,7 @@ export default defineConfig({
             { text: 'Nuxt', link: '/frameworks/nuxt' },
             { text: 'Angular', link: '/frameworks/angular' },
             { text: 'Svelte', link: '/frameworks/svelte' },
+            { text: 'SvelteKit', link: '/frameworks/sveltekit' },
           ]
         },
         {
@@ -130,6 +132,22 @@ export default defineConfig({
             { text: 'Express', link: '/frameworks/express' },
             { text: 'Fastify', link: '/frameworks/fastify' },
             { text: 'Hono', link: '/frameworks/hono' },
+            { text: 'GraphQL', link: '/frameworks/graphql' },
+            { text: 'tRPC', link: '/frameworks/trpc' },
+          ]
+        },
+        {
+          text: 'Mobile & Native',
+          items: [
+            { text: 'React Native', link: '/frameworks/react-native' },
+            { text: 'Expo', link: '/frameworks/expo' },
+          ]
+        },
+        {
+          text: 'Tools & CLI',
+          items: [
+            { text: 'CLI Tool', link: '/frameworks/cli' },
+            { text: 'MCP Adapter', link: '/frameworks/mcp' },
           ]
         }
       ],

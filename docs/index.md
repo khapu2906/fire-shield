@@ -48,9 +48,21 @@ features:
     title: Zero Dependencies
     details: Core library has zero dependencies. Adapters only depend on their respective frameworks. Keep your bundle small.
 
+  - icon: 🚀
+    title: Lazy Role Evaluation
+    details: On-demand role loading for memory efficiency. Handle thousands of roles with 10x faster startup and 89% less memory.
+
+  - icon: 💾
+    title: Permission Caching
+    details: Smart caching with TTL and automatic cleanup. Up to 100x faster permission checks for high-traffic applications.
+
+  - icon: 🔧
+    title: Memory Optimization
+    details: Advanced memory profiling and optimization. String deduplication, optimized storage, and real-time statistics.
+
   - icon: 🧪
     title: Well Tested
-    details: 100% test coverage with comprehensive unit and integration tests. Production-ready and reliable.
+    details: 275+ tests with 100% pass rate. Comprehensive unit and integration tests. Production-ready and reliable.
 
   - icon: 📦
     title: Tree-Shakeable
@@ -283,6 +295,135 @@ app.get('/admin',
 export default app
 ```
 
+```svelte [SvelteKit]
+<script lang="ts">
+  import { can } from '@fire-shield/sveltekit'
+
+  const canWrite = can('posts:write')
+  const canDelete = can('posts:delete')
+</script>
+
+<!-- Reactive permission checks -->
+{#if $canWrite}
+  <button>Create Post</button>
+{/if}
+
+{#if $canDelete}
+  <button>Delete Post</button>
+{/if}
+```
+
+```typescript [GraphQL]
+import { GraphQLRBACAdapter } from '@fire-shield/graphql'
+
+const rbacAdapter = new GraphQLRBACAdapter(rbac)
+
+const resolvers = {
+  Mutation: {
+    createPost: rbacAdapter.protect('posts:write', (parent, args, context) => {
+      // Create post logic
+      return createPost(args.input)
+    }),
+
+    deletePost: rbacAdapter.protect('posts:delete', (parent, args, context) => {
+      // Delete post logic
+      return deletePost(args.id)
+    })
+  }
+}
+```
+
+```typescript [tRPC]
+import { createTRPCRBAC } from '@fire-shield/trpc'
+
+const { protectedProcedure } = createTRPCRBAC(rbac, {
+  getUser: (ctx) => ctx.user
+})
+
+const appRouter = router({
+  createPost: protectedProcedure('posts:write')
+    .input(z.object({ title: z.string() }))
+    .mutation(({ input }) => {
+      return createPost(input)
+    }),
+
+  deletePost: protectedProcedure('posts:delete')
+    .input(z.object({ id: z.string() }))
+    .mutation(({ input }) => {
+      return deletePost(input.id)
+    })
+})
+```
+
+```tsx [React Native]
+import { Can, useRBAC } from '@fire-shield/react-native'
+import { View, Button, Text } from 'react-native'
+
+function PostScreen() {
+  const { can } = useRBAC()
+
+  return (
+    <View>
+      <Can permission="posts:write">
+        <Button title="Create Post" onPress={createPost} />
+      </Can>
+
+      {can('posts:delete') && (
+        <Button title="Delete Post" onPress={deletePost} />
+      )}
+    </View>
+  )
+}
+```
+
+```tsx [Expo]
+import { Can, useRBAC } from '@fire-shield/expo'
+import { View, Button } from 'react-native'
+
+export default function App() {
+  const { can, hasRole } = useRBAC()
+
+  return (
+    <View>
+      <Can permission="posts:write">
+        <Button title="Create Post" onPress={createPost} />
+      </Can>
+
+      {hasRole('admin') && (
+        <Button title="Admin Panel" onPress={openAdmin} />
+      )}
+    </View>
+  )
+}
+```
+
+```bash [CLI]
+# Validate RBAC configuration
+fire-shield validate rbac.config.json
+
+# Check if user has permission
+fire-shield check user-123 posts:write --config rbac.config.json
+
+# Get system info
+fire-shield info
+```
+
+```typescript [MCP]
+// AI agents can use RBAC via Model Context Protocol
+import { createMCPServer } from '@fire-shield/mcp'
+
+// Start MCP server
+const server = createMCPServer(rbac)
+
+// AI can now:
+// - Check permissions: check_permission(user_id, permission)
+// - List roles: list_roles()
+// - Deny permissions: deny_permission(user_id, permission)
+// - Get denied permissions: get_denied_permissions(user_id)
+
+server.start()
+```
+
 :::
 
 ## Why Fire Shield?
@@ -313,7 +454,7 @@ export default app
         </tr>
         <tr>
           <td><strong>Bundle Size</strong></td>
-          <td class="highlight"><span class="badge info">🎯 ~15KB</span></td>
+          <td class="highlight"><span class="badge info">🎯 ~25KB</span></td>
           <td>~600KB+</td>
           <td>~350KB</td>
           <td>~180KB</td>
@@ -360,8 +501,32 @@ export default app
           <td><span class="badge error">❌ No</span></td>
         </tr>
         <tr>
+          <td><strong>Lazy Role Evaluation</strong></td>
+          <td class="highlight"><span class="badge success">✅ Yes</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Permission Caching</strong></td>
+          <td class="highlight"><span class="badge success">✅ Built-in</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Memory Optimization</strong></td>
+          <td class="highlight"><span class="badge success">✅ Yes</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+        </tr>
+        <tr>
           <td><strong>Framework Adapters</strong></td>
-          <td class="highlight"><span class="badge success">✅ 9+</span></td>
+          <td class="highlight"><span class="badge success">✅ 16</span></td>
           <td><span class="badge warning">🟡 Limited</span></td>
           <td><span class="badge warning">🟡 Limited</span></td>
           <td><span class="badge error">❌ No</span></td>

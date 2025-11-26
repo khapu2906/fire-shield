@@ -4,16 +4,17 @@
 	"description": "Flexible RBAC (Role-Based Access Control) package with adapters for multiple frameworks",
 	"private": true,
 	"workspaces": [
+		"benchmarks",
 		"packages/core",
 		"packages/adaptor/*"
 	],
 	"scripts": {
 		"build": "turbo run build",
-		"build:core": "turbo run build --filter=@rbac/core",
+		"build:core": "turbo run build --filter=@fire-shield/core",
 		"build:adaptors": "turbo run build --filter=./adaptor/*",
 		"dev": "turbo run dev",
 		"test": "turbo run test",
-		"test:core": "turbo run test --filter=@rbac/core",
+		"test:core": "turbo run test --filter=@fire-shield/core",
 		"lint": "turbo run lint",
 		"typecheck": "turbo run typecheck",
 		"clean": "turbo run clean",
@@ -35,6 +36,9 @@
 		"vitepress": "^1.6.4",
 		"vue": "^3.5.24",
 		"vue-router": "^4.6.3"
+	},
+	"overrides": {
+		"graphql": "^16.8.1"
 	},
 	"packageManager": "npm@9.0.0",
 	"engines": {

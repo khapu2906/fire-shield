@@ -19,7 +19,7 @@ Comparison of this RBAC library with popular alternatives in the market.
 
 | Library | Downloads/month | Stars | Last Update | Bundle Size |
 |---------|----------------|-------|-------------|-------------|
-| **@fire-shield/core** | - | - | Active | ~15KB |
+| **@fire-shield/core** | - | - | Active | ~25KB |
 | **accesscontrol** | ~266K | 2.3K | Low Activity | ~180KB |
 | **casbin** | ~264K | 2.8K | Active | ~600KB+ |
 | **rbac** (by Chris Kinsman) | ~48K | 1K | Jul 29, 2020 | 132KB |
@@ -96,7 +96,7 @@ const ability = new Ability([
 | **Documentation** | ✅ Excellent | 🟡 Good | ✅ Excellent | ✅ Excellent | 🟡 Basic |
 | **Examples** | ✅ Many | 🟡 Some | ✅ Many | ✅ Many | 🟡 Few |
 | **Framework integration** | ✅ Examples | 🟡 Some | ✅ Many | ✅ Many | 🟡 Basic |
-| **Bundle size** | ~15KB | ~180KB | ~600KB+ | ~350KB | ~35KB |
+| **Bundle size** | ~25KB | ~180KB | ~600KB+ | ~350KB | ~35KB |
 | **Active maintenance** | ✅ Yes | 🟡 Low Activity | ✅ Yes | ✅ Yes | 🟡 Old/Little Maintenance |
 
 **Winner:** This library for simplicity and size, casl for framework integrations
@@ -121,7 +121,7 @@ const ability = new Ability([
 
 **Strengths:**
 - ✅ **Fastest permission checks** - about one hundred million ops/sec with bit-based system
-- ✅ **Smallest bundle size** - 15KB minified
+- ✅ **Smallest bundle size** - 25KB minified
 - ✅ **Zero dependencies** - No supply chain risks
 - ✅ **Built-in audit logging** - For compliance and security
 - ✅ **Wildcard permissions** - Flexible pattern matching
@@ -427,7 +427,7 @@ rbac.hasPermission({ id: '1', roles: ['reader'] }, 'article:read');
 
 **Pros:**
 1. ⚡ **Fastest** - 15-260x faster than alternatives
-2. 📦 **Smallest** - ~15KB vs ~35-600KB+
+2. 📦 **Smallest** - ~25KB vs ~35-600KB+
 3. 🔒 **Most secure** - Built-in audit logging, deny permissions
 4. 🎯 **Most flexible** - Wildcards, bit-based, string-based
 5. 📘 **Best DX** - Excellent docs, examples, TypeScript

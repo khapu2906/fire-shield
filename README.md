@@ -291,7 +291,7 @@ Fire Shield is perfect for:
 | Feature | Fire Shield | Casbin | CASL | AccessControl | acl |
 |---------|------------|--------|------|---------------|-----|
 | **Performance** | 125M ops/sec ⚡ | 476K | 2M | 1M | 769K |
-| **Bundle Size** | ~15KB | ~600KB+ | ~350KB | ~180KB | ~35KB |
+| **Bundle Size** | ~25KB | ~600KB+ | ~350KB | ~180KB | ~35KB |
 | **Downloads/month** | - | 264K | 2.5M | 266K | 16.5K |
 | **Stars** | - | 2.8K | 6.7K | 2.3K | 2.6K |
 | **Wildcards** | ✅ Yes | ✅ Yes (regex) | 🟡 Partial | ✅ Yes | ❌ No |
@@ -325,7 +325,7 @@ Absolutely. Fire Shield provides migration guides and maintains API compatibilit
 
 ### What about bundle size and dependencies?
 
-Fire Shield has zero dependencies and a ~15KB bundle - the smallest among feature-rich RBAC libraries. This minimizes supply chain risks and improves load times.
+Fire Shield has zero dependencies and a ~25KB bundle - the smallest among feature-rich RBAC libraries. This minimizes supply chain risks and improves load times.
 
 ---
 

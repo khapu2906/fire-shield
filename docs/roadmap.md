@@ -43,28 +43,56 @@ Fire Shield development roadmap and upcoming features.
 
 </div>
 
+## ✅ Recently Completed
+
+<div class="roadmap-section completed">
+
+### v2.2.0 - Performance, Tooling & Deny Permissions (November 2025)
+
+**Core Improvements** - ✅ 100% Complete
+- ✅ **Config file loading** - `RBAC.fromFile()`, `RBAC.fromJSON()`, validation helpers (Phase 1.1)
+- ✅ **Permission caching layer** - Cache permission check results for better performance (Phase 1.2)
+- ✅ **Lazy role evaluation** - Load roles only when needed, reduce memory footprint
+- ✅ **Memory optimization** - Optimize for large permission sets (1000+ permissions)
+
+**Tooling & Integration** - ✅ 100% Complete
+- ✅ **CLI tool** - `fire-shield validate`, `fire-shield check`, permission management (Phase 2.1)
+- ✅ **GraphQL adapter** - First-class GraphQL directives and middleware (Phase 2.2)
+- ✅ **tRPC adapter** - Type-safe RPC middleware for tRPC
+- ✅ **Benchmark suite** - Continuous performance tracking and regression detection
+
+**New Framework Adapters** - ✅ 100% Complete
+- ✅ **MCP Adapter** - Model Context Protocol integration for AI agents (8 MCP tools)
+- ✅ **SvelteKit Adapter** - Server-side hooks and page guards for SvelteKit
+- ✅ **React Native Adapter** - Mobile-first RBAC for React Native apps
+- ✅ **Expo Adapter** - Optimized for Expo managed workflow
+
+**Bonus Features** - ✅ Not in Original Plan
+- ✅ **Deny Permissions Support** - Added to ALL 9 adapters (React, React Native, Expo, Vue, GraphQL, tRPC, Express, Next.js, Nuxt)
+  - ~35+ new functions/hooks/components/directives
+  - Wildcard pattern support in denies
+  - Consistent API across all platforms
+
+**Statistics**
+- 460+ passing tests (up from 241)
+- 11 total adapters (CLI, GraphQL, tRPC, React Native, Expo, MCP, SvelteKit + existing 4)
+- ~35+ new deny-related functions
+- Benchmark suite with 4 test suites
+- ~25KB bundle size, zero dependencies
+
+</div>
+
 ## 🚧 In Progress
 
 <div class="roadmap-section in-progress">
 
-### v2.2 - Performance & Developer Experience (Dec 2025 - Q1 2026)
+### v2.3 - Developer Experience (Q1 2026)
 
-**Performance Optimizations**
-- 🚧 Permission caching layer
-- 🚧 Lazy role evaluation
-- 🚧 Memory optimization for large permission sets
-- 🚧 Benchmark suite for continuous performance tracking
-
-**Developer Experience**
-- 🚧 Interactive playground on documentation site
-- 🚧 CLI tool for permission management
-- 🚧 Config file loading convenience methods (`RBAC.fromFile()`, validation)
-- 🚧 GraphQL adapter
-
-**Documentation**
-- 🚧 Video tutorials
-- 🚧 Migration guides from other RBAC libraries
-- 🚧 Real-world case studies
+**Documentation & Learning**
+- 🚧 **Interactive playground** - Try Fire Shield directly in browser
+- 🚧 **Migration guides** - From Casbin, CASL, AccessControl to Fire Shield
+- 🚧 **Real-world case studies** - Production examples and patterns
+- 🚧 **Video tutorials** - Getting started and advanced topics
 
 </div>
 
