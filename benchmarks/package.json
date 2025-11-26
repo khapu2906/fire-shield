@@ -1,0 +1,22 @@
+{
+  "name": "@fire-shield/benchmarks",
+  "version": "2.2.0",
+  "type": "module",
+  "private": true,
+  "description": "Performance benchmarks for Fire Shield RBAC",
+  "scripts": {
+    "bench": "node --experimental-modules benchmark.js",
+    "bench:permission": "node --experimental-modules permission-checks.js",
+    "bench:deny": "node --experimental-modules deny-permissions.js",
+    "bench:cache": "node --experimental-modules caching.js",
+    "bench:all": "npm run bench && npm run bench:permission && npm run bench:deny && npm run bench:cache"
+  },
+  "dependencies": {
+    "@fire-shield/core": "file:../packages/core",
+    "benchmark": "^2.1.4",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/benchmark": "^2.1.5"
+  }
+}
