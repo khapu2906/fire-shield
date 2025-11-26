@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/next",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Next.js adapter for RBAC authorization",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.1.1"
+    "@fire-shield/core": "^2.2.0"
   },
   "devDependencies": {
     "next": "^14.0.0",

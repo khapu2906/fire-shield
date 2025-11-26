@@ -282,6 +282,84 @@ export class NextRBACAdapter {
   getRBAC(): RBAC {
     return this.rbac;
   }
+
+  /**
+   * Deny permission for a user
+   */
+  async denyPermission(request: NextRequest, permission: string): Promise<void> {
+    const user = await this.options.getUser(request);
+    if (!user) {
+      throw new Error('No user found in request');
+    }
+    this.rbac.denyPermission(user.id, permission);
+  }
+
+  /**
+   * Allow (remove deny) permission for a user
+   */
+  async allowPermission(request: NextRequest, permission: string): Promise<void> {
+    const user = await this.options.getUser(request);
+    if (!user) {
+      throw new Error('No user found in request');
+    }
+    this.rbac.allowPermission(user.id, permission);
+  }
+
+  /**
+   * Get denied permissions for a user
+   */
+  async getDeniedPermissions(request: NextRequest): Promise<string[]> {
+    const user = await this.options.getUser(request);
+    if (!user) {
+      return [];
+    }
+    return this.rbac.getDeniedPermissions(user.id);
+  }
+
+  /**
+   * Check if permission is denied for a user
+   */
+  async isDenied(request: NextRequest, permission: string): Promise<boolean> {
+    const user = await this.options.getUser(request);
+    if (!user) {
+      return false;
+    }
+
+    const deniedPermissions = this.rbac.getDeniedPermissions(user.id);
+    return deniedPermissions.some((denied) => {
+      if (denied === permission) return true;
+      if (denied.includes('*')) {
+        const pattern = denied.replace(/\*/g, '.*');
+        return new RegExp(`^${pattern}$`).test(permission);
+      }
+      return false;
+    });
+  }
+
+  /**
+   * HOC to block access if permission is denied
+   */
+  withNotDenied<T extends (...args: any[]) => any>(permission: string, handler: T): T {
+    return (async (...args: any[]) => {
+      const request = args[0] as NextRequest;
+
+      try {
+        const isDenied = await this.isDenied(request, permission);
+
+        if (isDenied) {
+          const result: AuthorizationResult = {
+            allowed: false,
+            reason: `Permission "${permission}" is explicitly denied`,
+          };
+          return this.options.onUnauthorized(result, request);
+        }
+
+        return handler(...args);
+      } catch (error) {
+        return this.options.onError(error as Error, request);
+      }
+    }) as T;
+  }
 }
 
 // Export helper functions for common use cases
