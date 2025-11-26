@@ -171,6 +171,72 @@ export function useAnyPermission(...permissions: string[]): ComputedRef<boolean>
 }
 
 /**
+ * Deny permission for current user
+ * @returns Function to deny a permission
+ */
+export function useDenyPermission() {
+  const rbac = useRBAC();
+  const user = useUser();
+
+  return (permission: string) => {
+    if (!user.value) {
+      throw new Error('Cannot deny permission: No user found');
+    }
+    rbac.denyPermission(user.value.id, permission);
+  };
+}
+
+/**
+ * Allow (remove deny) permission for current user
+ * @returns Function to allow a previously denied permission
+ */
+export function useAllowPermission() {
+  const rbac = useRBAC();
+  const user = useUser();
+
+  return (permission: string) => {
+    if (!user.value) {
+      throw new Error('Cannot allow permission: No user found');
+    }
+    rbac.allowPermission(user.value.id, permission);
+  };
+}
+
+/**
+ * Get denied permissions for current user (reactive)
+ * @returns Computed ref with array of denied permissions
+ */
+export function useDeniedPermissions(): ComputedRef<string[]> {
+  const rbac = useRBAC();
+  const user = useUser();
+
+  return computed(() => {
+    if (!user.value) return [];
+    return rbac.getDeniedPermissions(user.value.id);
+  });
+}
+
+/**
+ * Check if permission is denied for current user (reactive)
+ * @param permission Permission to check
+ * @returns Computed ref with boolean
+ */
+export function useIsDenied(permission: string): ComputedRef<boolean> {
+  const deniedPermissions = useDeniedPermissions();
+
+  return computed(() => {
+    return deniedPermissions.value.some((denied) => {
+      if (denied === permission) return true;
+      if (denied.includes('*')) {
+        const pattern = denied.replace(/\*/g, '.*');
+        return new RegExp(`^${pattern}$`).test(permission);
+      }
+      return false;
+    });
+  });
+}
+
+/**
  * v-permission directive
  * Usage: v-permission="'posts:read'"
  */
