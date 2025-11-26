@@ -4,6 +4,9 @@ import { RoleHierarchy } from './core/role-hierarchy';
 import type { RBACConfigSchema, PresetConfig, RBACSystemState } from './types/config.types';
 import type { AuditLogger, AuditEvent } from './types/audit.types';
 import { WildcardMatcher } from './utils/wildcard-matcher';
+import { PermissionCache, type PermissionCacheOptions } from './utils/permission-cache';
+import { MemoryOptimizer } from './utils/memory-optimizer';
+import { readFileSync } from 'fs';
 
 /**
  * User interface for RBAC context
@@ -179,6 +182,17 @@ export class RBAC {
   private auditLogger?: AuditLogger;
   private enableWildcards: boolean;
   private denyList: Map<string, Set<string>>; // userId -> denied permissions
+  private cache?: PermissionCache; // Permission caching layer
+  private cacheEnabled: boolean;
+
+  // Lazy role evaluation
+  private lazyRoles: boolean;
+  private pendingRoles: Map<string, { permissions: string[]; level?: number }>; // Roles not yet evaluated
+  private evaluatedRoles: Set<string>; // Roles that have been loaded
+
+  // Memory optimization
+  private memoryOptimizer?: MemoryOptimizer;
+  private optimizeMemory: boolean;
 
   constructor(options: {
     // Config-based initialization
@@ -192,12 +206,35 @@ export class RBAC {
     // Advanced features
     auditLogger?: AuditLogger;
     enableWildcards?: boolean;
+
+    // Performance features (v2.2)
+    enableCache?: boolean;
+    cacheOptions?: PermissionCacheOptions;
+    lazyRoles?: boolean;
+    optimizeMemory?: boolean;
   } = {}) {
     this.useBitSystem = options.useBitSystem ?? true; // Default to bit system
     this.roleHierarchy = new RoleHierarchy();
     this.auditLogger = options.auditLogger;
     this.enableWildcards = options.enableWildcards ?? true; // Default to enabled
     this.denyList = new Map();
+
+    // Initialize cache if enabled 
+    this.cacheEnabled = options.enableCache ?? false;
+    if (this.cacheEnabled) {
+      this.cache = new PermissionCache(options.cacheOptions);
+    }
+
+    // Initialize lazy role evaluation
+    this.lazyRoles = options.lazyRoles ?? false;
+    this.pendingRoles = new Map();
+    this.evaluatedRoles = new Set();
+
+    // Initialize memory optimizer
+    this.optimizeMemory = options.optimizeMemory ?? false;
+    if (this.optimizeMemory) {
+      this.memoryOptimizer = new MemoryOptimizer();
+    }
 
     // Initialize bit or legacy system
     if (this.useBitSystem) {
@@ -226,32 +263,104 @@ export class RBAC {
   private loadFromConfig(config: RBACConfigSchema): void {
     // Register permissions
     for (const permConfig of config.permissions) {
+      // Intern permission strings to reduce memory
+      const permName = this.optimizeMemory && this.memoryOptimizer
+        ? this.memoryOptimizer.internString(permConfig.name)
+        : permConfig.name;
+
       if (this.useBitSystem && this.bitPermissionManager) {
         // Register with manual bit if provided
-        this.bitPermissionManager.registerPermission(permConfig.name, permConfig.bit);
+        this.bitPermissionManager.registerPermission(permName, permConfig.bit);
       }
     }
 
     // Register roles
     for (const roleConfig of config.roles) {
-      // Register role with permissions
-      if (this.useBitSystem && this.bitPermissionManager) {
-        this.bitPermissionManager.registerRole(roleConfig.name, roleConfig.permissions);
-      } else if (this.roleManager) {
-        this.roleManager.createRole(roleConfig.name, roleConfig.permissions);
-      }
+      //Intern role name and permissions
+      const roleName = this.optimizeMemory && this.memoryOptimizer
+        ? this.memoryOptimizer.internString(roleConfig.name)
+        : roleConfig.name;
 
-      // Set role level in hierarchy
-      if (roleConfig.level !== undefined) {
-        this.roleHierarchy.setRoleLevel(roleConfig.name, roleConfig.level);
+      const permissions = this.optimizeMemory && this.memoryOptimizer
+        ? this.memoryOptimizer.internStrings(roleConfig.permissions)
+        : roleConfig.permissions;
+
+      if (this.lazyRoles) {
+        // Store role config for lazy evaluation
+        this.pendingRoles.set(roleName, {
+          permissions,
+          level: roleConfig.level
+        });
+      } else {
+        // Eager loading: Register role immediately
+        if (this.useBitSystem && this.bitPermissionManager) {
+          this.bitPermissionManager.registerRole(roleName, permissions);
+        } else if (this.roleManager) {
+          this.roleManager.createRole(roleName, permissions);
+        }
+
+        // Set role level in hierarchy
+        if (roleConfig.level !== undefined) {
+          this.roleHierarchy.setRoleLevel(roleName, roleConfig.level);
+        }
       }
     }
+  }
+
+  /**
+   * Evaluate a lazy role on first access
+   */
+  private evaluateLazyRole(roleName: string): void {
+    // Check if role is already evaluated
+    if (this.evaluatedRoles.has(roleName)) {
+      return;
+    }
+
+    // Get pending role config
+    const roleConfig = this.pendingRoles.get(roleName);
+    if (!roleConfig) {
+      // Role doesn't exist in pending or already registered
+      return;
+    }
+
+    // Register the role
+    if (this.useBitSystem && this.bitPermissionManager) {
+      this.bitPermissionManager.registerRole(roleName, roleConfig.permissions);
+    } else if (this.roleManager) {
+      this.roleManager.createRole(roleName, roleConfig.permissions);
+    }
+
+    // Set role level in hierarchy
+    if (roleConfig.level !== undefined) {
+      this.roleHierarchy.setRoleLevel(roleName, roleConfig.level);
+    }
+
+    // Mark as evaluated and remove from pending
+    this.evaluatedRoles.add(roleName);
+    this.pendingRoles.delete(roleName);
   }
 
   /**
    * Check if user has permission
    */
   hasPermission(user: RBACUser, permission: string): boolean {
+    // Evaluate lazy roles on first access
+    if (this.lazyRoles) {
+      for (const role of user.roles) {
+        if (this.pendingRoles.has(role)) {
+          this.evaluateLazyRole(role);
+        }
+      }
+    }
+
+    // Check cache first
+    if (this.cacheEnabled && this.cache) {
+      const cached = this.cache.get(user.id, permission);
+      if (cached !== undefined) {
+        return cached;
+      }
+    }
+
     let allowed = false;
     let reason: string | undefined;
 
@@ -259,6 +368,10 @@ export class RBAC {
       // Check deny list first (explicit deny takes precedence)
       if (this.isPermissionDenied(user.id, permission)) {
         reason = `Permission explicitly denied: ${permission}`;
+        // Cache the deny result
+        if (this.cacheEnabled && this.cache) {
+          this.cache.set(user.id, permission, false);
+        }
         return false;
       }
 
@@ -272,13 +385,23 @@ export class RBAC {
         // Check direct permission mask first
         if (user.permissionMask !== undefined) {
           allowed = this.bitPermissionManager.hasPermission(user.permissionMask, permission);
-          if (allowed) return true;
+          if (allowed) {
+            if (this.cacheEnabled && this.cache) {
+              this.cache.set(user.id, permission, true);
+            }
+            return true;
+          }
         }
 
         // Check direct permissions array (with wildcard support)
         if (user.permissions) {
           allowed = this.checkPermissionsWithWildcard(user.permissions, permission);
-          if (allowed) return true;
+          if (allowed) {
+            if (this.cacheEnabled && this.cache) {
+              this.cache.set(user.id, permission, true);
+            }
+            return true;
+          }
         }
 
         // Check role-based permissions (with wildcard support)
@@ -289,17 +412,26 @@ export class RBAC {
           const roleMask = this.bitPermissionManager.getRoleMask(role);
           if (roleMask !== undefined && this.bitPermissionManager.hasPermission(roleMask, permission)) {
             allowed = true;
+            if (this.cacheEnabled && this.cache) {
+              this.cache.set(user.id, permission, true);
+            }
             return true;
           }
 
           // Check wildcard permissions
           if (this.enableWildcards && this.checkPermissionsWithWildcard(rolePermissions, permission)) {
             allowed = true;
+            if (this.cacheEnabled && this.cache) {
+              this.cache.set(user.id, permission, true);
+            }
             return true;
           }
         }
 
         reason = `User lacks permission: ${permission}`;
+        if (this.cacheEnabled && this.cache) {
+          this.cache.set(user.id, permission, false);
+        }
         return false;
       }
 
@@ -307,7 +439,12 @@ export class RBAC {
       // Check direct permissions first (with wildcard support)
       if (user.permissions) {
         allowed = this.checkPermissionsWithWildcard(user.permissions, permission);
-        if (allowed) return true;
+        if (allowed) {
+          if (this.cacheEnabled && this.cache) {
+            this.cache.set(user.id, permission, true);
+          }
+          return true;
+        }
       }
 
       // Check role-based permissions (with wildcard support)
@@ -315,11 +452,17 @@ export class RBAC {
         const rolePermissions = this.roleManager?.getRolePermissions(role) ?? [];
         if (this.checkPermissionsWithWildcard(rolePermissions, permission)) {
           allowed = true;
+          if (this.cacheEnabled && this.cache) {
+            this.cache.set(user.id, permission, true);
+          }
           return true;
         }
       }
 
       reason = `User lacks permission: ${permission}`;
+      if (this.cacheEnabled && this.cache) {
+        this.cache.set(user.id, permission, false);
+      }
       return false;
     } finally {
       // Audit log
@@ -506,6 +649,30 @@ export class RBAC {
   }
 
   /**
+   * Get all registered roles
+   */
+  getAllRoles(): string[] {
+    if (this.useBitSystem && this.bitPermissionManager) {
+      return this.bitPermissionManager.getAllRoles();
+    } else if (this.roleManager) {
+      return Array.from(this.roleManager['roles'].keys()); // Access private roles map
+    }
+    return [];
+  }
+
+  /**
+   * Get permissions for a specific role
+   */
+  getRolePermissions(roleName: string): string[] {
+    if (this.useBitSystem && this.bitPermissionManager) {
+      return this.bitPermissionManager.getRolePermissions(roleName);
+    } else if (this.roleManager) {
+      return this.roleManager.getRolePermissions(roleName);
+    }
+    return [];
+  }
+
+  /**
    * Deny a permission for a specific user
    * Explicit denies take precedence over allows
    */
@@ -627,6 +794,330 @@ export class RBAC {
     const state = JSON.parse(json) as RBACSystemState;
     this.deserialize(state);
   }
+
+  /**
+   * Static method: Create RBAC instance from JSON string
+   * @param json JSON string containing PresetConfig
+   * @param options Additional RBAC options
+   * @returns New RBAC instance
+   */
+  static fromJSONConfig(json: string, options: {
+    useBitSystem?: boolean;
+    strictMode?: boolean;
+    auditLogger?: AuditLogger;
+    enableWildcards?: boolean;
+    enableCache?: boolean;
+    cacheOptions?: PermissionCacheOptions;
+    lazyRoles?: boolean;
+    optimizeMemory?: boolean;
+  } = {}): RBAC {
+    try {
+      const config = JSON.parse(json) as PresetConfig;
+
+      // Validate config
+      RBAC.validateConfig(config);
+
+      return new RBAC({
+        preset: config,
+        ...options
+      });
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        throw new Error(`Invalid JSON: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Static method: Create RBAC instance from file (Node.js only)
+   * @param filePath Path to JSON config file
+   * @param options Additional RBAC options
+   * @returns New RBAC instance
+   */
+  static async fromFile(filePath: string, options: {
+    useBitSystem?: boolean;
+    strictMode?: boolean;
+    auditLogger?: AuditLogger;
+    enableWildcards?: boolean;
+    enableCache?: boolean;
+    cacheOptions?: PermissionCacheOptions;
+    lazyRoles?: boolean;
+    optimizeMemory?: boolean;
+  } = {}): Promise<RBAC> {
+    // Dynamic import for Node.js fs module (tree-shakeable for browser builds)
+    try {
+      const { readFile } = await import('fs/promises');
+      const fileContent = await readFile(filePath, 'utf-8');
+      return RBAC.fromJSONConfig(fileContent, options);
+    } catch (error: any) {
+      if (error.code === 'ENOENT') {
+        throw new Error(`Config file not found: ${filePath}`);
+      }
+      if (error.code === 'EACCES') {
+        throw new Error(`Permission denied reading file: ${filePath}`);
+      }
+      throw new Error(`Failed to load config from file: ${error.message}`);
+    }
+  }
+
+  /**
+   * Static method: Create RBAC instance from file synchronously (Node.js only)
+   * @param filePath Path to JSON config file
+   * @param options Additional RBAC options
+   * @returns New RBAC instance
+   */
+  static fromFileSync(filePath: string, options: {
+    useBitSystem?: boolean;
+    strictMode?: boolean;
+    auditLogger?: AuditLogger;
+    enableWildcards?: boolean;
+    enableCache?: boolean;
+    cacheOptions?: PermissionCacheOptions;
+    lazyRoles?: boolean;
+    optimizeMemory?: boolean;
+  } = {}): RBAC {
+    // Dynamic import for Node.js fs module
+    try {
+      const fileContent = readFileSync(filePath, 'utf-8');
+      return RBAC.fromJSONConfig(fileContent, options);
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        if ((error as { code: string }).code === 'ENOENT') {
+          throw new Error(`Config file not found: ${filePath}`);
+        }
+        if ((error as { code: string }).code === 'EACCES') {
+          throw new Error(`Permission denied reading file: ${filePath}`);
+        }
+      }
+      throw new Error(`Failed to load config from file: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+
+  /**
+   * Get list of evaluated role names
+   */
+  getEvaluatedRoles(): string[] {
+    return Array.from(this.evaluatedRoles);
+  }
+
+  /**
+   * Get list of pending (not yet evaluated) role names
+   */
+  getPendingRoles(): string[] {
+    return Array.from(this.pendingRoles.keys());
+  }
+
+  /**
+   * Get lazy role evaluation statistics
+   */
+  getLazyRoleStats() {
+    return {
+      enabled: this.lazyRoles,
+      pending: this.pendingRoles.size,
+      evaluated: this.evaluatedRoles.size,
+      total: this.pendingRoles.size + this.evaluatedRoles.size
+    };
+  }
+
+  /**
+   * Check if a specific role is pending (not yet evaluated)
+   */
+  isRolePending(roleName: string): boolean {
+    return this.pendingRoles.has(roleName);
+  }
+
+  /**
+   * Force evaluation of all pending roles
+   */
+  evaluateAllRoles(): void {
+    if (!this.lazyRoles) {
+      // If lazy roles is disabled, all roles are already evaluated
+      return;
+    }
+
+    // Evaluate all pending roles
+    const pendingRoleNames = Array.from(this.pendingRoles.keys());
+    for (const roleName of pendingRoleNames) {
+      this.evaluateLazyRole(roleName);
+    }
+  }
+
+  /**
+   * Get memory optimization statistics
+   */
+  getMemoryStats() {
+    if (!this.memoryOptimizer) {
+      return {
+        enabled: false,
+        stringPoolSize: 0,
+        roleMaskCacheSize: 0,
+        wildcardPatternCacheSize: 0,
+        estimatedMemorySaved: 0
+      };
+    }
+
+    return {
+      enabled: true,
+      ...this.memoryOptimizer.getStats()
+    };
+  }
+
+  /**
+   * Get memory optimizer instance (for advanced usage)
+   */
+  getMemoryOptimizer(): MemoryOptimizer | undefined {
+    return this.memoryOptimizer;
+  }
+
+  /**
+   * Compact memory by cleaning up unused resources
+   * Returns number of items removed
+   */
+  compactMemory(): {
+    stringsRemoved: number;
+    cacheEntriesRemoved: number;
+  } {
+    let stringsRemoved = 0;
+    let cacheEntriesRemoved = 0;
+
+    // Compact permission cache
+    if (this.cache) {
+      cacheEntriesRemoved = this.cache.cleanup();
+    }
+
+    // Compact string pool if memory optimizer is enabled
+    if (this.memoryOptimizer && this.bitPermissionManager) {
+      // Collect all active permission and role strings
+      const activeStrings = new Set<string>();
+
+      // Add all registered permissions
+      const allPermissions = this.bitPermissionManager.getAllPermissions();
+      allPermissions.forEach(perm => activeStrings.add(perm));
+
+      // Add all registered roles
+      const allRoles = this.bitPermissionManager.getAllRoles();
+      for (const role of allRoles) {
+        activeStrings.add(role);
+        const rolePerms = this.bitPermissionManager.getRolePermissions(role);
+        rolePerms.forEach(perm => activeStrings.add(perm));
+      }
+
+      stringsRemoved = this.memoryOptimizer.compactStringPool(activeStrings);
+    }
+
+    return { stringsRemoved, cacheEntriesRemoved };
+  }
+
+  /**
+   * Invalidate cache for specific user
+   */
+  invalidateUserCache(userId: string): void {
+    if (this.cache) {
+      this.cache.invalidate(userId);
+    }
+  }
+
+  /**
+   * Invalidate cache for specific permission across all users
+   */
+  invalidatePermissionCache(permission: string): void {
+    if (this.cache) {
+      this.cache.invalidatePermission(permission);
+    }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats() {
+    return this.cache?.getStats();
+  }
+
+  /**
+   * Validate PresetConfig structure
+   * @param config Config to validate
+   * @throws Error if config is invalid
+   */
+  static validateConfig(config: PresetConfig): void {
+    if (!config || typeof config !== 'object') {
+      throw new Error('Config must be an object');
+    }
+
+    // Validate permissions array
+    if (!Array.isArray(config.permissions)) {
+      throw new Error('Config.permissions must be an array');
+    }
+
+    for (const [index, perm] of config.permissions.entries()) {
+      if (!perm.name || typeof perm.name !== 'string') {
+        throw new Error(`Permission at index ${index} must have a valid 'name' string`);
+      }
+      if (perm.bit !== undefined && (typeof perm.bit !== 'number' || perm.bit < 0)) {
+        throw new Error(`Permission '${perm.name}' has invalid bit value: ${perm.bit}`);
+      }
+    }
+
+    // Check for duplicate permission names
+    const permNames = new Set<string>();
+    for (const perm of config.permissions) {
+      if (permNames.has(perm.name)) {
+        throw new Error(`Duplicate permission name: ${perm.name}`);
+      }
+      permNames.add(perm.name);
+    }
+
+    // Check for duplicate bit values
+    const bitValues = new Set<number>();
+    for (const perm of config.permissions) {
+      if (perm.bit !== undefined) {
+        if (bitValues.has(perm.bit)) {
+          throw new Error(`Duplicate bit value ${perm.bit} in permission: ${perm.name}`);
+        }
+        bitValues.add(perm.bit);
+      }
+    }
+
+    // Validate roles array
+    if (!Array.isArray(config.roles)) {
+      throw new Error('Config.roles must be an array');
+    }
+
+    for (const [index, role] of config.roles.entries()) {
+      if (!role.name || typeof role.name !== 'string') {
+        throw new Error(`Role at index ${index} must have a valid 'name' string`);
+      }
+      if (!Array.isArray(role.permissions)) {
+        throw new Error(`Role '${role.name}' must have a 'permissions' array`);
+      }
+      if (role.level !== undefined && (typeof role.level !== 'number' || role.level < 0)) {
+        throw new Error(`Role '${role.name}' has invalid level: ${role.level}`);
+      }
+    }
+
+    // Check for duplicate role names
+    const roleNames = new Set<string>();
+    for (const role of config.roles) {
+      if (roleNames.has(role.name)) {
+        throw new Error(`Duplicate role name: ${role.name}`);
+      }
+      roleNames.add(role.name);
+    }
+
+    // Validate that role permissions reference existing permissions
+    const validPermissions = new Set(config.permissions.map(p => p.name));
+    for (const role of config.roles) {
+      for (const permName of role.permissions) {
+        // Skip wildcard permissions in validation
+        if (permName.includes('*')) continue;
+
+        if (!validPermissions.has(permName)) {
+          throw new Error(`Role '${role.name}' references undefined permission: ${permName}`);
+        }
+      }
+    }
+  }
 }
 
 // Export core classes
@@ -634,6 +1125,8 @@ export { BitPermissionManager } from './core/bit-permission-manager';
 export { RoleHierarchy } from './core/role-hierarchy';
 export { RBACBuilder } from './builders/rbac-builder';
 export { WildcardMatcher } from './utils/wildcard-matcher';
+export { PermissionCache } from './utils/permission-cache';
+export { MemoryOptimizer } from './utils/memory-optimizer';
 
 // Export types
 export type { UserRole, PermissionMask } from './types/user.types';

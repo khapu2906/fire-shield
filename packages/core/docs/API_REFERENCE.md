@@ -35,6 +35,12 @@ constructor(options?: {
   strictMode?: boolean;
   enableWildcards?: boolean;
   auditLogger?: AuditLogger;
+  // v2.2.0 options
+  lazyRoles?: boolean;
+  enableCache?: boolean;
+  cacheTTL?: number;
+  cacheCleanupInterval?: number;
+  optimizeMemory?: boolean;
 })
 ```
 
@@ -45,6 +51,11 @@ constructor(options?: {
 - `strictMode` - Enable strict mode (throws errors on invalid operations)
 - `enableWildcards` - Enable wildcard permission matching (default: `true`)
 - `auditLogger` - Optional audit logger for tracking permission checks
+- `lazyRoles` - Enable lazy role evaluation for memory efficiency (v2.2.0)
+- `enableCache` - Enable permission caching (v2.2.0)
+- `cacheTTL` - Cache time-to-live in milliseconds (default: 60000) (v2.2.0)
+- `cacheCleanupInterval` - Cache cleanup interval in milliseconds (default: 300000) (v2.2.0)
+- `optimizeMemory` - Enable memory optimization and profiling (v2.2.0)
 
 **Example:**
 ```typescript
@@ -367,6 +378,169 @@ Restore from JSON string.
 ```typescript
 const json = localStorage.getItem('rbac');
 rbac.fromJSON(json);
+```
+
+---
+
+### Lazy Role Evaluation Methods (v2.2.0)
+
+#### `getLazyRoleStats(): object`
+
+Get lazy role evaluation statistics.
+
+**Returns:** `{ enabled: boolean, pending: number, evaluated: number, total: number }`
+
+**Example:**
+```typescript
+const rbac = new RBAC({ lazyRoles: true, preset: config });
+const stats = rbac.getLazyRoleStats();
+console.log(stats);
+// { enabled: true, pending: 950, evaluated: 50, total: 1000 }
+```
+
+---
+
+#### `getPendingRoles(): string[]`
+
+Get list of pending (not yet evaluated) role names.
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const pendingRoles = rbac.getPendingRoles();
+console.log(pendingRoles); // ['role1', 'role2', ...]
+```
+
+---
+
+#### `isRolePending(roleName): boolean`
+
+Check if a specific role is pending evaluation.
+
+**Parameters:**
+- `roleName: string` - Role name to check
+
+**Returns:** `boolean`
+
+**Example:**
+```typescript
+if (rbac.isRolePending('admin')) {
+  console.log('Admin role not yet evaluated');
+}
+```
+
+---
+
+#### `evaluateAllRoles(): void`
+
+Force evaluation of all pending roles immediately.
+
+**Example:**
+```typescript
+// Evaluate all roles at once
+rbac.evaluateAllRoles();
+
+const stats = rbac.getLazyRoleStats();
+console.log(stats.pending); // 0 - all roles evaluated
+```
+
+---
+
+#### `getEvaluatedRoles(): string[]`
+
+Get list of already evaluated role names.
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const evaluated = rbac.getEvaluatedRoles();
+console.log(evaluated); // ['admin', 'editor', ...]
+```
+
+---
+
+### Permission Caching Methods (v2.2.0)
+
+#### `getCacheStats(): object`
+
+Get permission cache statistics.
+
+**Returns:** `{ hits: number, misses: number, size: number, hitRate: number }`
+
+**Example:**
+```typescript
+const rbac = new RBAC({ enableCache: true });
+const stats = rbac.getCacheStats();
+console.log(stats);
+// { hits: 1250, misses: 50, size: 100, hitRate: 96.15 }
+```
+
+---
+
+#### `clearPermissionCache(): void`
+
+Clear the permission cache.
+
+**Example:**
+```typescript
+// Clear cache after role/permission changes
+rbac.createRole('new-role', ['permission:*']);
+rbac.clearPermissionCache();
+```
+
+---
+
+### Memory Optimization Methods (v2.2.0)
+
+#### `getMemoryStats(): object`
+
+Get memory usage statistics.
+
+**Returns:** Memory statistics object with role count, permission count, and estimated bytes
+
+**Example:**
+```typescript
+const rbac = new RBAC({ optimizeMemory: true });
+const stats = rbac.getMemoryStats();
+console.log(stats);
+// {
+//   roles: 100,
+//   permissions: 500,
+//   estimatedBytes: 102400
+// }
+```
+
+---
+
+#### `getAllRoles(): string[]`
+
+Get all registered role names.
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const roles = rbac.getAllRoles();
+console.log(roles); // ['admin', 'editor', 'viewer']
+```
+
+---
+
+#### `getRolePermissions(roleName): string[]`
+
+Get all permissions for a specific role.
+
+**Parameters:**
+- `roleName: string` - Role name
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const permissions = rbac.getRolePermissions('editor');
+console.log(permissions); // ['post:read', 'post:write']
 ```
 
 ---

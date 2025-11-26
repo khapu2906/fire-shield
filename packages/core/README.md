@@ -15,7 +15,10 @@ A powerful, flexible, and type-safe Role-Based Access Control (RBAC) library for
 - **💾 State Persistence** - Built-in serialization/deserialization (storage-agnostic)
 - **📘 Type-Safe** - Full TypeScript support with comprehensive type definitions
 - **⚙️ Zero Dependencies** - Pure logic with no storage coupling
-- **✅ Comprehensive Testing** - 176+ tests with 100% pass rate
+- **🚀 Lazy Role Evaluation** - On-demand role loading for memory efficiency (v2.2.0)
+- **💾 Permission Caching** - Smart caching with TTL and automatic cleanup (v2.2.0)
+- **🔧 Memory Optimization** - Advanced memory profiling and optimization tools (v2.2.0)
+- **✅ Comprehensive Testing** - 275+ tests with 100% pass rate
 
 ## 📦 Installation
 
@@ -129,6 +132,78 @@ hierarchy.setRoleLevel('admin', 10);
 // Check if admin can act as moderator
 rbac.canActAsRole('admin', 'moderator'); // true
 rbac.canActAsRole('moderator', 'admin'); // false
+```
+
+### 🆕 Lazy Role Evaluation (v2.2.0)
+
+```typescript
+// Enable lazy role loading for large applications
+const rbac = new RBAC({
+  lazyRoles: true,
+  preset: largeConfigWithThousandsOfRoles
+});
+
+// Roles are loaded on-demand only when needed
+const stats = rbac.getLazyRoleStats();
+console.log(stats);
+// { enabled: true, pending: 1000, evaluated: 5, total: 1005 }
+
+// Force evaluation of all pending roles if needed
+rbac.evaluateAllRoles();
+
+// Check if a role is still pending
+rbac.isRolePending('rarely-used-role'); // true/false
+
+// Get list of pending roles
+const pendingRoles = rbac.getPendingRoles();
+```
+
+### 🆕 Permission Caching (v2.2.0)
+
+```typescript
+// Enable smart caching with TTL
+const rbac = new RBAC({
+  enableCache: true,
+  cacheTTL: 60000, // 60 seconds
+  cacheCleanupInterval: 300000 // 5 minutes
+});
+
+// Permission checks are automatically cached
+rbac.hasPermission(user, 'post:read'); // Cache miss - computed
+rbac.hasPermission(user, 'post:read'); // Cache hit - instant!
+
+// Get cache statistics
+const cacheStats = rbac.getCacheStats();
+console.log(cacheStats);
+// { hits: 1250, misses: 50, size: 100, hitRate: 96.15 }
+
+// Clear cache when roles/permissions change
+rbac.clearPermissionCache();
+```
+
+### 🆕 Memory Optimization (v2.2.0)
+
+```typescript
+// Enable memory profiling
+const rbac = new RBAC({
+  optimizeMemory: true
+});
+
+// Get memory usage statistics
+const memoryStats = rbac.getMemoryStats();
+console.log(memoryStats);
+// {
+//   totalMemory: 1024000,
+//   usedMemory: 512000,
+//   roles: 100,
+//   permissions: 500,
+//   estimatedBytes: 102400
+// }
+
+// Memory optimizer automatically:
+// - Deduplicates permission strings
+// - Optimizes role storage
+// - Manages cache size
 ```
 
 ## 📖 Examples
