@@ -1,17 +1,17 @@
 {
   "name": "@fire-shield/expo",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Expo adapter for Fire Shield RBAC optimized for managed workflow",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "react-native": "./dist/index.mjs",
+  "react-native": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -37,7 +37,7 @@
   "author": "khapu2906",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.0",
+    "@fire-shield/core": "^2.2.2",
     "@fire-shield/react-native": "^2.2.2"
   },
   "peerDependencies": {

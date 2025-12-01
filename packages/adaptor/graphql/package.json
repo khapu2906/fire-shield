@@ -1,16 +1,16 @@
 {
   "name": "@fire-shield/graphql",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "GraphQL adapter for Fire Shield RBAC with directives and middleware",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.ms",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -33,7 +33,7 @@
   "author": "khapu2906",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.0"
+    "@fire-shield/core": "^2.2.2"
   },
   "peerDependencies": {
     "graphql": "^16.0.0"

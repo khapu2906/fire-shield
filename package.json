@@ -6,7 +6,8 @@
 	"workspaces": [
 		"benchmarks",
 		"packages/core",
-		"packages/adaptor/*"
+		"packages/adaptor/*",
+		"packages/cli"
 	],
 	"scripts": {
 		"build": "turbo run build",

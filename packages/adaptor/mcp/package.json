@@ -1,16 +1,10 @@
 {
   "name": "@fire-shield/mcp",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Model Context Protocol (MCP) adapter for Fire Shield RBAC - AI agent integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
+  "module": "dist/index.mjs",
   "files": [
     "dist",
     "README.md"
@@ -41,7 +35,7 @@
     "directory": "packages/adaptor/mcp"
   },
   "dependencies": {
-    "@fire-shield/core": "^2.2.0"
+    "@fire-shield/core": "^2.2.2"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.23.0",

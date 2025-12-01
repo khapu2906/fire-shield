@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/react-native",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "React Native adapter for Fire Shield RBAC with hooks and components",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -35,7 +35,7 @@
   "author": "khapu2906",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.0"
+    "@fire-shield/core": "^2.2.2"
   },
   "peerDependencies": {
     "react": "^18.0.0",

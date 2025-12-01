@@ -1,14 +1,14 @@
 {
   "name": "@fire-shield/express",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Fire Shield Express.js adapter - Lightning-fast RBAC middleware for Express",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -48,7 +48,7 @@
     "express": "^4.0.0"
   },
   "dependencies": {
-    "@fire-shield/core": "2.2.0"
+    "@fire-shield/core": "^2.2.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.0",

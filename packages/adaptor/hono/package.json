@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/hono",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Hono adapter for RBAC authorization middleware",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,10 +17,10 @@
   "author": "Fire Shield Team",
   "license": "DIB",
   "peerDependencies": {
-    "hono": "4.10.6"
+    "hono": "^4.10.6"
   },
   "dependencies": {
-    "@fire-shield/core": "^2.2.0"
+    "@fire-shield/core": "^2.2.2"
   },
   "devDependencies": {
     "hono": "^4.10.6",

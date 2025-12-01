@@ -1,14 +1,14 @@
 {
   "name": "@fire-shield/sveltekit",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "SvelteKit adapter for Fire Shield RBAC - Server-side hooks and page guards",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -41,7 +41,7 @@
     "directory": "packages/adaptor/sveltekit"
   },
   "dependencies": {
-    "@fire-shield/core": "^2.2.0"
+    "@fire-shield/core": "^2.2.2"
   },
   "devDependencies": {
     "@sveltejs/kit": "^2.0.0",
