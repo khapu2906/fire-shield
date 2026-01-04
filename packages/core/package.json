@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/core",
-  "version": "2.2.2",
+  "version": "3.0.0",
   "description": "Fire Shield - A powerful, flexible RBAC (Role-Based Access Control) library with lightning-fast bit-based permissions, wildcards, audit logging, and zero dependencies",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -35,7 +35,8 @@
     "deny-permissions",
     "role-hierarchy",
     "bit-based",
-    "typescript"
+    "typescript",
+    "plugin-system"
   ],
   "author": "Developers in Black (DIB)",
   "repository": {

@@ -48,6 +48,10 @@ features:
     title: Zero Dependencies
     details: Core library has zero dependencies. Adapters only depend on their respective frameworks. Keep your bundle small.
 
+  - icon: 🧪
+    title: Plugin System (NEW!)
+    details: Extensible architecture for custom logic. Create plugins for databases, analytics, and more. (v3.0.0)
+
   - icon: 🚀
     title: Lazy Role Evaluation
     details: On-demand role loading for memory efficiency. Handle thousands of roles with 10x faster startup and 89% less memory.
@@ -62,11 +66,12 @@ features:
 
   - icon: 🧪
     title: Well Tested
-    details: 275+ tests with 100% pass rate. Comprehensive unit and integration tests. Production-ready and reliable.
+    details: 310+ tests with 100% pass rate. Comprehensive unit and integration tests. Production-ready and reliable.
 
   - icon: 📦
     title: Tree-Shakeable
     details: Modern ESM build with tree-shaking support. Only import what you need for optimal bundle size.
+
 ---
 
 <style>
@@ -99,20 +104,56 @@ pnpm add @fire-shield/core
 ## Basic Usage
 
 ```typescript
-import { RBAC } from '@fire-shield/core'
+import { RBAC } from '@fire-shield/core';
 
 // Create RBAC instance
-const rbac = new RBAC()
+const rbac = new RBAC();
 
 // Define roles and permissions
-rbac.createRole('admin', ['posts:*', 'users:*'])
-rbac.createRole('editor', ['posts:read', 'posts:write'])
-rbac.createRole('viewer', ['posts:read'])
+rbac.createRole('admin', ['posts:*', 'users:*']);
+rbac.createRole('editor', ['posts:read', 'posts:write']);
+rbac.createRole('viewer', ['posts:read']);
 
 // Check permissions
-const user = { id: '1', roles: ['editor'] }
+const user = { id: '1', roles: ['editor'] };
 rbac.hasPermission(user, 'posts:write') // ✅ true
 rbac.hasPermission(user, 'users:delete') // ❌ false
+```
+
+### Using Plugin System (v3.0.0)
+
+```typescript
+import { RBAC, RBACPlugin } from '@fire-shield/core';
+
+// Create custom plugin
+class DatabaseLoaderPlugin implements RBACPlugin {
+  name = 'database-loader';
+  
+  onPermissionCheck(event) {
+    // Log to database for audit
+    console.log(`[AUDIT] User ${event.userId} checked ${event.permission}: ${event.allowed}`);
+  }
+}
+
+// Register plugin
+const rbac = new RBAC();
+await rbac.registerPlugin(new DatabaseLoaderPlugin());
+
+// All permission checks now trigger to plugin
+rbac.hasPermission(user, 'posts:write');
+```
+
+### Loading Config from JSON
+
+```typescript
+// Platform-independent config loading (v3.0.0)
+import { RBAC } from '@fire-shield/core';
+
+const json = require('./rbac.config.json');
+const rbac = RBAC.fromJSONConfig(JSON.stringify(json));
+
+// Works in Node.js, Browser, Edge, etc.
+rbac.hasPermission(user, 'posts:read');
 ```
 
 ## Framework Integrations
@@ -426,6 +467,43 @@ server.start()
 
 :::
 
+## What's New in v3.0.0
+
+### 🧪 Plugin System
+- **Extensible Architecture** - Create custom plugins to extend RBAC functionality
+- **Built-in Hooks** - React to permission checks, role additions, permission registration
+- **Plugin Examples** - Database loader, audit logger plugins, custom validators
+- **Async Plugin Lifecycle** - Safe plugin management without breaking core operations
+
+### 🚫 Breaking Changes from v2.x
+- **`RBAC.fromFile()`** - **REMOVED** (Use loader packages instead)
+- **`RBAC.fromFileSync()`** - **REMOVED** (Use loader packages instead)
+- **`RBAC.validateConfig()`** - Still works, API unchanged
+
+### 📦 Migration from v2.x to v3.0.0
+
+**Node.js:**
+```typescript
+// Before (v2.x)
+import { RBAC } from '@fire-shield/core';
+const rbac = await RBAC.fromFile('./rbac.config.json');
+
+// After (v3.0.0) - Not yet created loader packages
+import { RBAC } from '@fire-shield/core';
+const json = require('./rbac.config.json');
+const rbac = RBAC.fromJSONConfig(json);
+```
+
+**Browser/SSR:**
+```typescript
+// Both versions work to same
+import { RBAC } from '@fire-shield/core';
+const json = require('./rbac.config.json');
+const rbac = RBAC.fromJSONConfig(json);
+```
+
+**[Full Migration Guide](/guide/migration-v3)** - See detailed migration instructions
+
 ## Why Fire Shield?
 
 <div class="comparison-section">
@@ -451,6 +529,14 @@ server.start()
           <td><span class="badge success">✅ Full</span></td>
           <td><span class="badge warning">🟡 Partial</span></td>
           <td><span class="badge warning">🟡 Partial</span></td>
+        </tr>
+        <tr>
+          <td><strong>Plugin System</strong></td>
+          <td class="highlight"><span class="badge success">✅ v3.0.0</span></td>
+          <td><span class="badge warning">🟡 Plugin</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
+          <td><span class="badge error">❌ No</span></td>
         </tr>
         <tr>
           <td><strong>Bundle Size</strong></td>
@@ -647,7 +733,7 @@ server.start()
 }
 </style>
 
-## Support the Project
+## Support → Project
 
 If you find Fire Shield helpful, consider supporting its development:
 

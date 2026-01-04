@@ -6,7 +6,7 @@ import type { AuditLogger, AuditEvent } from './types/audit.types';
 import { WildcardMatcher } from './utils/wildcard-matcher';
 import { PermissionCache, type PermissionCacheOptions } from './utils/permission-cache';
 import { MemoryOptimizer } from './utils/memory-optimizer';
-import { readFileSync } from 'fs';
+import { PluginManager, type RBACPlugin } from './plugins/rbac-plugin';
 
 /**
  * User interface for RBAC context
@@ -194,6 +194,9 @@ export class RBAC {
   private memoryOptimizer?: MemoryOptimizer;
   private optimizeMemory: boolean;
 
+  // Plugin system (v3.0)
+  private pluginManager: PluginManager;
+
   constructor(options: {
     // Config-based initialization
     config?: RBACConfigSchema;
@@ -235,6 +238,9 @@ export class RBAC {
     if (this.optimizeMemory) {
       this.memoryOptimizer = new MemoryOptimizer();
     }
+
+    // Initialize plugin system
+    this.pluginManager = new PluginManager(this);
 
     // Initialize bit or legacy system
     if (this.useBitSystem) {
@@ -465,6 +471,22 @@ export class RBAC {
       }
       return false;
     } finally {
+      // Trigger plugin hooks (v3.0) - fire and forget
+      this.pluginManager.triggerPermissionCheck({
+        type: 'permission_check',
+        userId: user.id,
+        permission,
+        allowed,
+        reason: allowed ? undefined : reason,
+        context: {
+          roles: user.roles,
+        },
+        timestamp: Date.now(),
+      }).catch(err => {
+        // Don't let plugin errors break permission checks
+        console.error('Plugin error:', err);
+      });
+
       // Audit log
       this.logAudit({
         type: 'permission_check',
@@ -597,6 +619,12 @@ export class RBAC {
     } else {
       this.roleManager?.createRole(roleName, permissions);
     }
+
+    // Trigger plugin hooks (v3.0)
+    this.pluginManager.triggerRoleAdded(roleName, permissions).catch(err => {
+      // Don't let plugin errors break role creation
+      console.error('Plugin error in createRole:', err);
+    });
   }
 
   /**
@@ -624,7 +652,15 @@ export class RBAC {
     if (!this.useBitSystem || !this.bitPermissionManager) {
       throw new Error('registerPermission is only available in bit-based mode');
     }
-    return this.bitPermissionManager.registerPermission(permissionName, manualBit);
+    const bit = this.bitPermissionManager.registerPermission(permissionName, manualBit);
+
+    // Trigger plugin hooks (v3.0)
+    this.pluginManager.triggerPermissionRegistered(permissionName, bit).catch(err => {
+      // Don't let plugin errors break permission registration
+      console.error('Plugin error in registerPermission:', err);
+    });
+
+    return bit;
   }
 
   /**
@@ -756,7 +792,7 @@ export class RBAC {
         roles: {},
         nextBitValue: 1,
         timestamp: Date.now(),
-        version: '1.0.0',
+        version: '2.2.2',
       },
       hierarchy: this.roleHierarchy.serialize(),
       config: { permissions: [], roles: [] }, // Config was already loaded
@@ -826,71 +862,6 @@ export class RBAC {
         throw new Error(`Invalid JSON: ${error.message}`);
       }
       throw error;
-    }
-  }
-
-  /**
-   * Static method: Create RBAC instance from file (Node.js only)
-   * @param filePath Path to JSON config file
-   * @param options Additional RBAC options
-   * @returns New RBAC instance
-   */
-  static async fromFile(filePath: string, options: {
-    useBitSystem?: boolean;
-    strictMode?: boolean;
-    auditLogger?: AuditLogger;
-    enableWildcards?: boolean;
-    enableCache?: boolean;
-    cacheOptions?: PermissionCacheOptions;
-    lazyRoles?: boolean;
-    optimizeMemory?: boolean;
-  } = {}): Promise<RBAC> {
-    // Dynamic import for Node.js fs module (tree-shakeable for browser builds)
-    try {
-      const { readFile } = await import('fs/promises');
-      const fileContent = await readFile(filePath, 'utf-8');
-      return RBAC.fromJSONConfig(fileContent, options);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        throw new Error(`Config file not found: ${filePath}`);
-      }
-      if (error.code === 'EACCES') {
-        throw new Error(`Permission denied reading file: ${filePath}`);
-      }
-      throw new Error(`Failed to load config from file: ${error.message}`);
-    }
-  }
-
-  /**
-   * Static method: Create RBAC instance from file synchronously (Node.js only)
-   * @param filePath Path to JSON config file
-   * @param options Additional RBAC options
-   * @returns New RBAC instance
-   */
-  static fromFileSync(filePath: string, options: {
-    useBitSystem?: boolean;
-    strictMode?: boolean;
-    auditLogger?: AuditLogger;
-    enableWildcards?: boolean;
-    enableCache?: boolean;
-    cacheOptions?: PermissionCacheOptions;
-    lazyRoles?: boolean;
-    optimizeMemory?: boolean;
-  } = {}): RBAC {
-    // Dynamic import for Node.js fs module
-    try {
-      const fileContent = readFileSync(filePath, 'utf-8');
-      return RBAC.fromJSONConfig(fileContent, options);
-    } catch (error: unknown) {
-      if (typeof error === 'object' && error !== null && 'code' in error) {
-        if ((error as { code: string }).code === 'ENOENT') {
-          throw new Error(`Config file not found: ${filePath}`);
-        }
-        if ((error as { code: string }).code === 'EACCES') {
-          throw new Error(`Permission denied reading file: ${filePath}`);
-        }
-      }
-      throw new Error(`Failed to load config from file: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -1036,6 +1007,37 @@ export class RBAC {
   }
 
   /**
+   * Register a plugin
+   * @param plugin Plugin instance to register
+   */
+  async registerPlugin(plugin: RBACPlugin): Promise<void> {
+    return this.pluginManager.register(plugin);
+  }
+
+  /**
+   * Unregister a plugin
+   * @param pluginName Name of plugin to unregister
+   */
+  async unregisterPlugin(pluginName: string): Promise<void> {
+    return this.pluginManager.unregister(pluginName);
+  }
+
+  /**
+   * Get a registered plugin
+   * @param pluginName Name of plugin
+   */
+  getPlugin(pluginName: string): RBACPlugin | undefined {
+    return this.pluginManager.getPlugin(pluginName);
+  }
+
+  /**
+   * Get all registered plugins
+   */
+  getAllPlugins(): RBACPlugin[] {
+    return this.pluginManager.getAllPlugins();
+  }
+
+  /**
    * Validate PresetConfig structure
    * @param config Config to validate
    * @throws Error if config is invalid
@@ -1128,8 +1130,12 @@ export { WildcardMatcher } from './utils/wildcard-matcher';
 export { PermissionCache } from './utils/permission-cache';
 export { MemoryOptimizer } from './utils/memory-optimizer';
 
+// Export plugin system (v3.0)
+export { PluginManager, RBACPlugin } from './plugins/rbac-plugin';
+
 // Export types
-export type { UserRole, PermissionMask } from './types/user.types';
+export type { UserRole } from './types/user.types';
+export type { PermissionMask } from './types/utility.types';
 export type {
   RBACConfigSchema,
   RBACConfigOptions,
@@ -1151,3 +1157,30 @@ export {
 
 // Export optional presets
 export { defaultPreset } from './presets/default.preset';
+
+// Export utility functions
+export {
+	matchPermission,
+	parsePermission,
+	hasPermission,
+	hasAnyPermission,
+	hasAllPermissions,
+	RBACError
+} from './utils/permission-utils';
+
+// Export type guards
+export { isRBACUser, isAuditEvent } from './utils/type-guards';
+
+// Export utility types
+export type { WithMetadata } from './types/utility.types';
+export { PermissionCheckType } from './types/utility.types';
+
+// Export audit logger examples
+export {
+	SecurityMonitorLogger,
+	ComplianceLogger,
+	AnalyticsLogger,
+	RotatingDatabaseLogger,
+	AsyncLogger,
+	SamplingLogger
+} from './utils/audit-log-examples';

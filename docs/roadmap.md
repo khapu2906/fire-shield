@@ -11,74 +11,61 @@ Fire Shield development roadmap and upcoming features.
 
 <div class="roadmap-section completed">
 
-### v2.1.1 - Current Release (November 2025)
+### v3.0.0 - Plugin System & Platform Independence (January 2026)
 
-**Core Features**
-- ✅ **Bit-based Permission System** - up to 10 million ops/sec, O(1) permission checks
-- ✅ **String-based Fallback System** - Support for >31 permissions
-- ✅ **Wildcard Permissions** - Pattern matching (`admin:*`, `*:read`, `tenant:123:*`)
-- ✅ **Deny Permissions** - Explicit denials that override allows
-- ✅ **Audit Logging** - 3 built-in loggers (Console, Buffered, Multi)
-- ✅ **Role Hierarchy** - Level-based role inheritance with 17 methods
-- ✅ **State Serialization** - Complete JSON export/import
-- ✅ **RBAC Builder** - Fluent API with method chaining
-- ✅ **Zero Dependencies** - No runtime dependencies, 15KB bundle
+**Core Features** - ✅ 100% Complete
+- ✅ **Plugin System** - Extensible architecture for custom logic (NEW!)
+  - `RBACPlugin` interface with 3 hooks
+  - `PluginManager` class for plugin lifecycle management
+  - `onPermissionCheck()` - Triggered on every permission check
+  - `onRoleAdded()` - Triggered when role is created
+  - `onPermissionRegistered()` - Triggered when permission is registered
+  - `registerPlugin()` / `unregisterPlugin()` methods
+  - `getPlugin()` / `getAllPlugins()` methods
+- ✅ **Platform Independence** - Removed fs module dependency (BREAKING CHANGE!)
+  - ✅ **Config Loading** - `RBAC.fromJSONConfig()` - Platform-independent (Node.js, Browser, Edge)
+  - ✅ **Removed Methods** - `RBAC.fromFile()` and `RBAC.fromFileSync()` - Use loader packages instead
 
-**Framework Adapters (9+)**
-- ✅ Express v2.0.5 - Middleware with guards
-- ✅ Fastify v2.0.5 - preHandler hooks
-- ✅ Hono v2.0.5 - Edge runtime support
-- ✅ Next.js v2.0.1 - App Router integration
-- ✅ Nuxt v2.0.1 - Nuxt 3 module
-- ✅ React v2.0.2 - Hooks & components
-- ✅ Vue v2.0.8 - Composables, directives, router guards
-- ✅ Angular v2.0.1 - Services, guards, directives
-- ✅ Svelte v2.0.1 - Stores & actions
+**Plugin Hooks Examples**
+- ✅ **Audit Database Plugin** - Log permission checks to database
+- ✅ **Analytics Plugin** - Track permission check events
+- ✅ **Rate Limit Plugin** - Prevent excessive permission checks
+- ✅ **Validator Plugin** - Custom permission validation logic
 
-**Testing & Documentation**
-- ✅ **241+ Test Cases** - 100% pass rate, 2106+ lines
-- ✅ **VitePress Documentation** - 50+ pages with interactive examples
-- ✅ **12+ Example Files** - Real-world patterns and use cases
-- ✅ **TypeScript 100%** - Full type safety across all packages
+**Documentation Updates**
+- ✅ **Updated README.md** - v3.0.0 features, breaking changes, migration guide
+- ✅ **Updated docs/index.md** - Homepage with plugin system info
+- ✅ **Plugin Examples** - Database loader, analytics, rate limiting examples
+- ✅ **Migration Guide** - From v2.x to v3.0.0 (fromFile removal, plugin system)
 
-</div>
+**Breaking Changes**
+- ⚠️ `RBAC.fromFile()` - REMOVED (Use `@fire-shield/node-loader` package)
+- ⚠️ `RBAC.fromFileSync()` - REMOVED (Use `@fire-shield/node-loader` package)
+- ✅ `RBAC.fromJSONConfig()` - Still works, unchanged (cross-platform)
+- ✅ `RBAC.validateConfig()` - Still works, unchanged
 
-## ✅ Recently Completed
+**Migration Path**
+```typescript
+// Before (v2.x)
+import { RBAC } from '@fire-shield/core';
+const rbac = await RBAC.fromFile('./rbac.config.json');
 
-<div class="roadmap-section completed">
+// After (v3.0.0) - Browser/Edge (works same)
+import { RBAC } from '@fire-shield/core';
+const json = require('./rbac.config.json');
+const rbac = RBAC.fromJSONConfig(json);
 
-### v2.2.0 - Performance, Tooling & Deny Permissions (November 2025)
-
-**Core Improvements** - ✅ 100% Complete
-- ✅ **Config file loading** - `RBAC.fromFile()`, `RBAC.fromJSON()`, validation helpers (Phase 1.1)
-- ✅ **Permission caching layer** - Cache permission check results for better performance (Phase 1.2)
-- ✅ **Lazy role evaluation** - Load roles only when needed, reduce memory footprint
-- ✅ **Memory optimization** - Optimize for large permission sets (1000+ permissions)
-
-**Tooling & Integration** - ✅ 100% Complete
-- ✅ **CLI tool** - `fire-shield validate`, `fire-shield check`, permission management (Phase 2.1)
-- ✅ **GraphQL adapter** - First-class GraphQL directives and middleware (Phase 2.2)
-- ✅ **tRPC adapter** - Type-safe RPC middleware for tRPC
-- ✅ **Benchmark suite** - Continuous performance tracking and regression detection
-
-**New Framework Adapters** - ✅ 100% Complete
-- ✅ **MCP Adapter** - Model Context Protocol integration for AI agents (8 MCP tools)
-- ✅ **SvelteKit Adapter** - Server-side hooks and page guards for SvelteKit
-- ✅ **React Native Adapter** - Mobile-first RBAC for React Native apps
-- ✅ **Expo Adapter** - Optimized for Expo managed workflow
-
-**Bonus Features** - ✅ Not in Original Plan
-- ✅ **Deny Permissions Support** - Added to ALL 9 adapters (React, React Native, Expo, Vue, GraphQL, tRPC, Express, Next.js, Nuxt)
-  - ~35+ new functions/hooks/components/directives
-  - Wildcard pattern support in denies
-  - Consistent API across all platforms
+// After (v3.0.0) - Node.js (loader package - coming soon)
+import { NodeLoader } from '@fire-shield/node-loader';
+const rbac = await NodeLoader.load('./rbac.config.json');
+```
 
 **Statistics**
-- 460+ passing tests (up from 241)
-- 11 total adapters (CLI, GraphQL, tRPC, React Native, Expo, MCP, SvelteKit + existing 4)
-- ~35+ new deny-related functions
-- Benchmark suite with 4 test suites
-- ~25KB bundle size, zero dependencies
+- 310+ passing tests (up from 460, after removing fromFile tests)
+- Plugin system with 3 hooks
+- 0 runtime dependencies (unchanged)
+- ~25KB bundle size (unchanged)
+- Platform-independent core (tree-shakeable for browser)
 
 </div>
 
@@ -86,13 +73,47 @@ Fire Shield development roadmap and upcoming features.
 
 <div class="roadmap-section in-progress">
 
-### v2.3 - Developer Experience (Q1 2026)
+### v3.1 - Loader Packages & Plugin Ecosystem (Q1 2026)
 
-**Documentation & Learning**
-- 🚧 **Interactive playground** - Try Fire Shield directly in browser
-- 🚧 **Migration guides** - From Casbin, CASL, AccessControl to Fire Shield
-- 🚧 **Real-world case studies** - Production examples and patterns
-- 🚧 **Video tutorials** - Getting started and advanced topics
+**Loader Packages**
+- 🚧 **Node Loader** - File system access for Node.js backends
+  - `NodeLoader.load()` - Async file loading
+  - `NodeLoader.loadSync()` - Synchronous file loading
+  - `NodeLoader.loadFromDirectory()` - Load multiple config files
+  - Validation and error handling
+
+- 🚧 **Web Loader** - Browser-compatible config loading
+  - `WebLoader.fromFetch()` - Load from HTTP/HTTPS endpoints
+  - `WebLoader.fromLocalStorage()` - Load from browser storage
+  - `WebLoader.fromURL()` - Load from CDN URLs
+  - CORS and security handling
+
+**Plugin Examples**
+- 🚧 **Database Loader Plugin** - Load config from database
+  - PostgreSQL, MySQL, MongoDB support
+  - Prisma, Drizzle ORM integration
+  - Connection pooling and caching
+
+- 🚧 **Redis Cache Plugin** - Distributed permission caching
+  - Redis-based permission cache
+  - Cache invalidation and expiration
+  - Cluster support
+
+- 🚧 **Elasticsearch Audit Plugin** - Log events to Elasticsearch
+  - Structured audit logs
+  - Search and analytics support
+  - Index management
+
+**Documentation**
+- 🚧 **Plugin System Guide** - How to create custom plugins
+  - Plugin lifecycle and best practices
+  - Hook reference and examples
+  - Testing plugins
+
+- 🚧 **Loader Package Guide** - How to use loader packages
+  - Installation and configuration
+  - Migration examples
+  - Troubleshooting
 
 </div>
 
@@ -100,48 +121,198 @@ Fire Shield development roadmap and upcoming features.
 
 <div class="roadmap-section planned">
 
-### v2.3 - Advanced Features (Q2-Q3 2026)
+### v3.2 - Advanced Plugin Features (Q2 2026)
 
-**Attribute-Based Access Control (ABAC)**
-- 📋 Context-based permissions
-- 📋 Dynamic permission evaluation
-- 📋 Custom permission validators
-- 📋 Time-based permissions (temporal access)
+**Plugin Enhancements**
+- 📋 **Plugin Dependencies** - Plugins can depend on other plugins
+- 📋 **Plugin Middleware** - Transform plugin hooks before/after execution
+- 📋 **Plugin Events** - Pub/sub event system for plugins
+- 📋 **Plugin Configuration** - Configurable plugin options
 
-**Multi-Tenancy Enhancements**
-- 📋 Tenant isolation guarantees
-- 📋 Cross-tenant permission sharing
-- 📋 Tenant-specific role hierarchies
-- 📋 Tenant analytics and reporting
+**Built-in Plugins**
+- 📋 **Analytics Plugin** - Built-in analytics and metrics
+- 📋 **Cache Plugin** - Redis/memcached integration
+- 📋 **Audit Plugin** - Elasticsearch/Logstash integration
+- 📋 **Webhook Plugin** - Send events to webhooks
+- 📋 **Notification Plugin** - Send alerts on permission changes
 
-**Database Integrations**
-- 📋 Prisma integration
-- 📋 Drizzle ORM integration
-- 📋 TypeORM integration
-- 📋 MongoDB native support
+### v3.3 - Enterprise Features (Q3 2026)
 
-**Security Features**
-- 📋 Permission change notifications
-- 📋 Anomaly detection in access patterns
-- 📋 Rate limiting for permission checks
-- 📋 Security compliance reports (SOC2, GDPR, HIPAA)
+**Enterprise Plugins**
+- 📋 **LDAP Plugin** - Integrate with LDAP/Active Directory
+- 📋 **OAuth2 Plugin** - OAuth2 token validation
+- 📋 **SAML Plugin** - SAML SSO integration
+- 📋 **SCIM Plugin** - User provisioning and sync
 
-### v2.4 - Ecosystem Growth (Q4 2026)
+**Security Plugins**
+- 📋 **IP Whitelist Plugin** - IP-based access control
+- 📋 **Geo-Fencing Plugin** - Geographic access restrictions
+- 📋 **Time-Based Plugin** - Temporal access control
+- 📋 **MFA Plugin** - Multi-factor authentication integration
+
+**Admin Plugins**
+- 📋 **Admin Dashboard Plugin** - Web-based RBAC admin panel
+- 📋 **Visualization Plugin** - Graphical role/permission viewer
+- 📋 **Reporting Plugin** - Compliance reports and analytics
+- 📋 **Audit Log Plugin** - Advanced audit log querying
+
+### v3.4 - Ecosystem Expansion (Q4 2026)
 
 **Framework Adapters**
-- 📋 Remix adapter
-- 📋 Astro adapter
-- 📋 SolidJS adapter
-- 📋 Qwik adapter
-- 📋 NestJS decorator-based adapter
-- 📋 tRPC middleware
+- 📋 NestJS adapter - Native NestJS integration
+- 📋 Remix adapter - Remix framework support
+- 📋 Astro adapter - Astro framework support
+- 📋 SolidJS adapter - SolidJS framework support
+- 📋 Qwik adapter - Qwik framework support
 
-**Tooling**
-- 📋 Permission visualization tool
-- 📋 Role conflict detector
-- 📋 Permission dependency analyzer
-- 📋 Import/export from CSV, JSON, YAML
+**Developer Tools**
+- 📋 **VS Code Extension** - RBAC language support and tools
+- 📋 **CLI Enhancements** - Better CLI commands and interactive mode
+- 📋 **Admin UI** - Web-based admin panel
+- 📋 **Migration Tool** - Automated migration from other RBAC libraries
 
+</div>
+
+## 💡 Future Ideas
+
+<div class="roadmap-section future">
+
+### Long-term Vision (2027+)
+
+**Advanced Permission Models**
+- 💡 **Conditional Permissions** - If-then rules for dynamic evaluation
+- 💡 **Permission Templates** - Reusable permission schemas
+- 💡 **Permission Marketplace** - Share common permission schemas
+- 💡 **Policy Engine** - Complex policy evaluation (OPA, XACML)
+- 💡 **Attribute-Based Access Control (ABAC)** - Full ABAC support
+
+**Enterprise Features**
+- 💡 **Multi-Tenancy** - Advanced multi-tenant RBAC
+- 💡 **Distributed RBAC** - Cross-microservice RBAC sync
+- 💡 **RBAC-as-a-Service** - Cloud-hosted RBAC solution
+- 💡 **SSO Integration** - SAML, OIDC, CAS integration
+- 💡 **Compliance Framework** - SOC2, HIPAA, GDPR compliance
+
+**Developer Experience**
+- 💡 **Visual Builder** - Drag-and-drop RBAC builder
+- 💡 **Auto-Discovery** - Auto-discover roles/permissions from codebase
+- 💡 **Testing Tools** - RBAC testing and validation tools
+- 💡 **IDE Extensions** - VS Code, WebStorm, IntelliJ plugins
+- 💡 **DevOps Integration** - Kubernetes, Docker, CI/CD integrations
+
+**Infrastructure**
+- 💡 **Edge Deployment** - Cloudflare Workers, Vercel Edge, Deno Deploy
+- 💡 **Serverless Functions** - AWS Lambda, Azure Functions, GCP Functions
+- 💡 **Microservices Support** - Service mesh integration, gRPC support
+- 💡 **Database Integrations** - Native database drivers, ORM plugins
+- 💡 **Caching Layer** - Redis, Memcached, Varnish integration
+
+</div>
+
+## 🎯 Community Priorities
+
+Based on GitHub issues and community feedback, these features are most requested:
+
+<div class="priority-list">
+
+### High Priority
+1. **Plugin System** - Extensible architecture for custom logic ✅ (v3.0.0)
+2. **Node Loader Package** - File system access for Node.js (v3.1.0)
+3. **Web Loader Package** - Browser-compatible config loading (v3.1.0)
+4. **Plugin Examples** - Database, analytics, rate limiting plugins (v3.1.0)
+5. **Migration Guide v2.x → v3.0.0** - Upgrade documentation (v3.0.0)
+
+### Medium Priority
+1. **Redis Cache Plugin** - Distributed permission caching (v3.2.0)
+2. **Database Loader Plugin** - Load config from database (v3.1.0)
+3. **Admin Dashboard** - Web-based RBAC admin panel (v3.3.0)
+4. **NestJS Adapter** - Native NestJS integration (v3.4.0)
+5. **VS Code Extension** - IDE support and tools (v3.4.0)
+
+### Under Consideration
+1. **Conditional Permissions** - If-then rules for dynamic evaluation
+2. **Permission Marketplace** - Share common permission schemas
+3. **Federated RBAC** - Cross-organization permissions
+4. **ABAC Support** - Attribute-Based Access Control
+
+</div>
+
+## 📊 Release Cycle
+
+<div class="release-info">
+
+**Major Versions** (x.0.0)
+- Released yearly
+- May include breaking changes
+- Extensive migration guides provided
+
+**Minor Versions** (3.x.0)
+- Released quarterly
+- New features, backward compatible
+- Performance improvements
+
+**Patch Versions** (3.0.x)
+- Released as needed
+- Bug fixes and security updates
+- No breaking changes
+
+</div>
+
+## 🤝 How to Contribute
+
+We welcome contributions to help achieve this roadmap!
+
+### Ways to Contribute
+
+**Code Contributions**
+- Pick an issue from our [GitHub Issues](https://github.com/khapu2906/fire-shield/issues)
+- Submit pull requests for roadmap features
+- Write tests and improve coverage
+
+**Documentation**
+- Improve existing documentation
+- Write tutorials and guides
+- Translate documentation to other languages
+
+**Community**
+- Answer questions in discussions
+- Share your Fire Shield use cases
+- Write blog posts about Fire Shield
+
+**Feedback**
+- Report bugs and issues
+- Suggest new features
+- Vote on existing feature requests
+
+### Feature Requests
+
+Have an idea not on this roadmap? We'd love to hear it!
+
+1. Check [existing issues](https://github.com/khapu2906/fire-shield/issues)
+2. Create a new feature request
+3. Describe your use case
+4. Explain why it would benefit to community
+
+## 📢 Stay Updated
+
+- **GitHub**: Star and watch [khapu2906/fire-shield](https://github.com/khapu2906/fire-shield)
+- **NPM**: Follow [@fire-shield/core](https://www.npmjs.com/package/@fire-shield/core)
+- **Changelog**: Check [releases](https://github.com/khapu2906/fire-shield/releases)
+
+## ☕ Support → Project
+
+If you find Fire Shield helpful and want to support its development:
+
+<div style="margin: 2rem 0; text-align: center;">
+  <BuyMeACoffee />
+  <p style="margin-top: 1rem; color: var(--vp-c-text-2);">Your support helps maintain and improve Fire Shield! 🙏</p>
+</div>
+
+---
+
+<div class="roadmap-footer">
+  <p><em>Last updated: January 2026</em></p>
+  <p>This roadmap is subject to change based on community needs and feedback.</p>
 </div>
 
 ## 💡 Future Ideas

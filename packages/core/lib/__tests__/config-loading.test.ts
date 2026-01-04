@@ -1,12 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { RBAC } from '../index';
-import { writeFileSync, unlinkSync, mkdirSync } from 'fs';
-import { join } from 'path';
 
 describe('Config Loading', () => {
-  const testConfigDir = join(__dirname, 'test-configs');
-  const testConfigPath = join(testConfigDir, 'test-rbac.json');
-
   const validConfig = {
     name: 'test-rbac',
     version: '1.0.0',
@@ -76,97 +71,9 @@ describe('Config Loading', () => {
     });
   });
 
-  describe('RBAC.fromFile', () => {
-    beforeAll(() => {
-      // Create test directory if it doesn't exist
-      try {
-        mkdirSync(testConfigDir, { recursive: true });
-      } catch (error) {
-        // Directory might already exist
-      }
-
-      // Write test config file
-      writeFileSync(testConfigPath, JSON.stringify(validConfig, null, 2));
-    });
-
-    afterAll(() => {
-      // Cleanup test file
-      try {
-        unlinkSync(testConfigPath);
-      } catch (error) {
-        // File might not exist
-      }
-    });
-
-    it('should load RBAC config from file asynchronously', async () => {
-      const rbac = await RBAC.fromFile(testConfigPath);
-
-      expect(rbac).toBeInstanceOf(RBAC);
-
-      const user = { id: '1', roles: ['viewer'] };
-      expect(rbac.hasPermission(user, 'user:read')).toBe(true);
-      expect(rbac.hasPermission(user, 'user:write')).toBe(false);
-    });
-
-    it('should throw error for non-existent file', async () => {
-      await expect(
-        RBAC.fromFile('/path/to/nonexistent/file.json')
-      ).rejects.toThrow('Config file not found');
-    });
-
-    it('should accept additional options', async () => {
-      const rbac = await RBAC.fromFile(testConfigPath, {
-        enableWildcards: true
-      });
-
-      expect(rbac).toBeInstanceOf(RBAC);
-    });
-  });
-
-  describe('RBAC.fromFileSync', () => {
-    beforeAll(() => {
-      // Create test directory if it doesn't exist
-      try {
-        mkdirSync(testConfigDir, { recursive: true });
-      } catch (error) {
-        // Directory might already exist
-      }
-
-      // Write test config file
-      writeFileSync(testConfigPath, JSON.stringify(validConfig, null, 2));
-    });
-
-    afterAll(() => {
-      // Cleanup test file
-      try {
-        unlinkSync(testConfigPath);
-      } catch (error) {
-        // File might not exist
-      }
-    });
-
-    it('should load RBAC config from file synchronously', () => {
-      const rbac = RBAC.fromFileSync(testConfigPath);
-
-      expect(rbac).toBeInstanceOf(RBAC);
-
-      const admin = { id: '1', roles: ['admin'] };
-      expect(rbac.hasPermission(admin, 'user:read')).toBe(true);
-      expect(rbac.hasPermission(admin, 'user:write')).toBe(true);
-      expect(rbac.hasPermission(admin, 'user:delete')).toBe(true);
-      expect(rbac.hasPermission(admin, 'post:delete')).toBe(true);
-    });
-
-    it('should throw error for non-existent file', () => {
-      expect(() => {
-        RBAC.fromFileSync('/path/to/nonexistent/file.json');
-      }).toThrow('Config file not found');
-    });
-  });
-
   describe('RBAC.validateConfig', () => {
     it('should validate correct config', () => {
-      expect(() => RBAC.validateConfig(validConfig)).not.toThrow();
+      expect(RBAC.validateConfig(validConfig)).toBe(undefined);
     });
 
     it('should throw for missing permissions array', () => {
@@ -235,7 +142,7 @@ describe('Config Loading', () => {
           }
         ]
       };
-      expect(() => RBAC.validateConfig(configWithWildcard)).not.toThrow();
+      RBAC.validateConfig(configWithWildcard); // Should not throw
     });
 
     it('should throw for invalid permission bit value', () => {
@@ -264,38 +171,31 @@ describe('Config Loading', () => {
   });
 
   describe('Integration Tests', () => {
-    it('should work end-to-end with file loading', async () => {
-      // Write config to file
-      const configPath = join(testConfigDir, 'integration-test.json');
-      writeFileSync(configPath, JSON.stringify(validConfig, null, 2));
+    it('should work end-to-end with config loading', () => {
+      const json = JSON.stringify(validConfig);
 
-      try {
-        // Load from file
-        const rbac = await RBAC.fromFile(configPath);
+      // Load from JSON config
+      const rbac = RBAC.fromJSONConfig(json);
 
-        // Create test users
-        const viewer = { id: '1', roles: ['viewer'] };
-        const editor = { id: '2', roles: ['editor'] };
-        const admin = { id: '3', roles: ['admin'] };
+      // Create test users
+      const viewer = { id: '1', roles: ['viewer'] };
+      const editor = { id: '2', roles: ['editor'] };
+      const admin = { id: '3', roles: ['admin'] };
 
-        // Test permissions
-        expect(rbac.hasPermission(viewer, 'user:read')).toBe(true);
-        expect(rbac.hasPermission(viewer, 'user:write')).toBe(false);
+      // Test permissions
+      expect(rbac.hasPermission(viewer, 'user:read')).toBe(true);
+      expect(rbac.hasPermission(viewer, 'user:write')).toBe(false);
 
-        expect(rbac.hasPermission(editor, 'user:read')).toBe(true);
-        expect(rbac.hasPermission(editor, 'user:write')).toBe(true);
-        expect(rbac.hasPermission(editor, 'post:write')).toBe(true);
+      expect(rbac.hasPermission(editor, 'user:read')).toBe(true);
+      expect(rbac.hasPermission(editor, 'user:write')).toBe(true);
+      expect(rbac.hasPermission(editor, 'post:write')).toBe(true);
 
-        expect(rbac.hasPermission(admin, 'user:delete')).toBe(true);
-        expect(rbac.hasPermission(admin, 'post:publish')).toBe(true);
-        expect(rbac.hasPermission(admin, 'post:delete')).toBe(true);
-      } finally {
-        // Cleanup
-        unlinkSync(configPath);
-      }
+      expect(rbac.hasPermission(admin, 'user:delete')).toBe(true);
+      expect(rbac.hasPermission(admin, 'post:publish')).toBe(true);
+      expect(rbac.hasPermission(admin, 'post:delete')).toBe(true);
     });
 
-    it('should handle complex config with deny permissions', async () => {
+    it('should handle complex config with deny permissions', () => {
       const complexConfig = {
         ...validConfig,
         roles: [
@@ -308,28 +208,62 @@ describe('Config Loading', () => {
         ]
       };
 
-      const configPath = join(testConfigDir, 'complex-test.json');
-      writeFileSync(configPath, JSON.stringify(complexConfig, null, 2));
+      const rbac = RBAC.fromJSONConfig(JSON.stringify(complexConfig));
 
-      try {
-        const rbac = await RBAC.fromFile(configPath);
+      const restrictedAdmin = { id: '4', roles: ['restricted-admin'] };
 
-        const restrictedAdmin = { id: '4', roles: ['restricted-admin'] };
+      // Should have all permissions
+      expect(rbac.hasPermission(restrictedAdmin, 'user:delete')).toBe(true);
 
-        // Should have all permissions
-        expect(rbac.hasPermission(restrictedAdmin, 'user:delete')).toBe(true);
+      // Deny specific permission
+      rbac.denyPermission('4', 'user:delete');
 
-        // Deny specific permission
-        rbac.denyPermission('4', 'user:delete');
+      // Should now be denied
+      expect(rbac.hasPermission(restrictedAdmin, 'user:delete')).toBe(false);
 
-        // Should now be denied
-        expect(rbac.hasPermission(restrictedAdmin, 'user:delete')).toBe(false);
+      // Other permissions still work
+      expect(rbac.hasPermission(restrictedAdmin, 'user:read')).toBe(true);
+    });
 
-        // Other permissions still work
-        expect(rbac.hasPermission(restrictedAdmin, 'user:read')).toBe(true);
-      } finally {
-        unlinkSync(configPath);
-      }
+    it('should work with role hierarchy', () => {
+      const config = {
+        name: 'test-rbac',
+        version: '1.0.0',
+        permissions: [
+          { name: 'read', bit: 1 },
+          { name: 'write', bit: 2 },
+          { name: 'admin', bit: 4 }
+        ],
+        roles: [
+          {
+            name: 'user',
+            permissions: ['read'],
+            level: 1
+          },
+          {
+            name: 'editor',
+            permissions: ['read', 'write'],
+            level: 2
+          },
+          {
+            name: 'admin',
+            permissions: ['read', 'write', 'admin'],
+            level: 3
+          }
+        ]
+      };
+
+      const rbac = RBAC.fromJSONConfig(JSON.stringify(config));
+
+      // Admin can act as editor and user (hierarchy)
+      expect(rbac.canActAsRole('admin', 'editor')).toBe(true);
+      expect(rbac.canActAsRole('admin', 'user')).toBe(true);
+
+      // Editor can act as user (hierarchy)
+      expect(rbac.canActAsRole('editor', 'user')).toBe(true);
+
+      // User cannot act as editor (no hierarchy)
+      expect(rbac.canActAsRole('user', 'editor')).toBe(false);
     });
   });
 });

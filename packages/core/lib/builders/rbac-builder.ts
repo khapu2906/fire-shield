@@ -20,10 +20,17 @@ import type { RoleConfig } from '../types/role.types';
 export class RBACBuilder {
 	private permissions: PermissionConfig[] = [];
 	private roles: RoleConfig[] = [];
+	private roleHierarchy: Record<string, string[]> = {};
 	private useBit: boolean = true;
 	private startBitValue: number = 1;
 	private strictMode: boolean = false;
 	private autoBitAssignment: boolean = true;
+	private wildcardsEnabled: boolean = true;
+	private auditLogger?: import('../types/audit.types').AuditLogger;
+	private currentRole?: string;
+
+	// Fluent API state
+	private buildingRole = false;
 
 	/**
 	 * Enable bit-based permission system (default)
@@ -62,6 +69,22 @@ export class RBACBuilder {
 	 */
 	enableStrictMode(): this {
 		this.strictMode = true;
+		return this;
+	}
+
+	/**
+	 * Enable or disable wildcard permission matching
+	 */
+	enableWildcards(enabled: boolean = true): this {
+		this.wildcardsEnabled = enabled;
+		return this;
+	}
+
+	/**
+	 * Add an audit logger to the RBAC instance
+	 */
+	withAuditLogger(logger: import('../types/audit.types').AuditLogger): this {
+		this.auditLogger = logger;
 		return this;
 	}
 
@@ -141,9 +164,56 @@ export class RBACBuilder {
 	}
 
 	/**
+	 * Fluent API: Start defining a role
+	 */
+	role(name: string): this {
+		if (this.buildingRole) {
+			throw new Error('Cannot start a new role while another role is being defined. Call grant() first.');
+		}
+
+		this.currentRole = name;
+		this.buildingRole = true;
+		return this;
+	}
+
+	/**
+	 * Fluent API: Grant permissions to current role
+	 */
+	grant(permissions: string[]): this {
+		if (!this.currentRole || !this.buildingRole) {
+			throw new Error('Must call role() before grant()');
+		}
+
+		// Auto-register permissions if not already in the permissions array
+		for (const perm of permissions) {
+			if (!this.permissions.some(p => p.name === perm)) {
+				this.addPermission(perm);
+			}
+		}
+
+		this.addRole(this.currentRole, permissions);
+		this.currentRole = undefined;
+		this.buildingRole = false;
+		return this;
+	}
+
+	/**
+	 * Fluent API: Set role hierarchy
+	 */
+	hierarchy(hierarchy: Record<string, string[]>): this {
+		this.roleHierarchy = { ...this.roleHierarchy, ...hierarchy };
+		return this;
+	}
+
+	/**
 	 * Build and return RBAC instance
 	 */
 	build(): RBAC {
+		// Validate state before building
+		if (this.buildingRole) {
+			throw new Error('Cannot build while a role is being defined. Call grant() to complete the role.');
+		}
+
 		const config: RBACConfigSchema = {
 			permissions: this.permissions,
 			roles: this.roles,
@@ -154,11 +224,32 @@ export class RBACBuilder {
 			},
 		};
 
-		return new RBAC({
+		const rbac = new RBAC({
 			config,
 			useBitSystem: this.useBit,
 			strictMode: this.strictMode,
+			enableWildcards: this.wildcardsEnabled,
+			auditLogger: this.auditLogger,
 		});
+
+		// Apply hierarchy if defined
+		this.applyHierarchy(rbac);
+
+		return rbac;
+	}
+
+	/**
+	 * Apply role hierarchy to the RBAC instance
+	 */
+	private applyHierarchy(rbac: RBAC): void {
+		if (Object.keys(this.roleHierarchy).length === 0) return;
+
+		for (const [parent, children] of Object.entries(this.roleHierarchy)) {
+			const parentLevel = rbac.getRoleHierarchy().getRoleLevel(parent) || 1;
+			children.forEach(child => {
+				rbac.getRoleHierarchy().setRoleLevel(child, parentLevel + 1);
+			});
+		}
 	}
 
 	/**
