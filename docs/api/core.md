@@ -21,10 +21,10 @@ new RBAC(options?: RBACOptions)
   - `strictMode?: boolean` - Enable strict mode for bit permissions
   - `auditLogger?: AuditLogger` - Custom audit logger
   - `enableWildcards?: boolean` - Enable wildcard permission matching (default: true)
-  - `enableCache?: boolean` - Enable permission caching (default: false) **v2.2.0**
-  - `cacheOptions?: PermissionCacheOptions` - Cache configuration **v2.2.0**
-  - `lazyRoles?: boolean` - Enable lazy role evaluation (default: false) **v2.2.0**
-  - `optimizeMemory?: boolean` - Enable memory optimization (default: false) **v2.2.0**
+  - `enableCache?: boolean` - Enable permission caching (default: false)
+  - `cacheOptions?: PermissionCacheOptions` - Cache configuration
+  - `lazyRoles?: boolean` - Enable lazy role evaluation (default: false)
+  - `optimizeMemory?: boolean` - Enable memory optimization (default: false)
 
 #### Example
 
@@ -39,7 +39,7 @@ const rbac = new RBAC({
   useBitSystem: true
 })
 
-// With v2.2.0 performance features
+// With performance features
 const rbacOptimized = new RBAC({
   enableCache: true,
   cacheOptions: {
@@ -55,7 +55,7 @@ const rbacOptimized = new RBAC({
 
 #### fromJSONConfig
 
-**v2.2.0** - Create RBAC instance from JSON configuration.
+Create RBAC instance from JSON configuration.
 
 ```typescript
 static fromJSONConfig(json: string, options?: RBACOptions): RBAC
@@ -84,44 +84,9 @@ const rbac = RBAC.fromJSONConfig(configJson, {
 })
 ```
 
-#### fromFile
-
-**v2.2.0** - Create RBAC instance from file (Node.js only, async).
-
-```typescript
-static async fromFile(filePath: string, options?: RBACOptions): Promise<RBAC>
-```
-
-**Parameters:**
-- `filePath` - Path to JSON config file
-- `options` - Additional RBAC options
-
-**Returns:** `Promise<RBAC>` instance
-
-**Example:**
-```typescript
-const rbac = await RBAC.fromFile('./config/rbac.json', {
-  enableCache: true,
-  lazyRoles: true
-})
-```
-
-#### fromFileSync
-
-**v2.2.0** - Create RBAC instance from file synchronously (Node.js only).
-
-```typescript
-static fromFileSync(filePath: string, options?: RBACOptions): RBAC
-```
-
-**Example:**
-```typescript
-const rbac = RBAC.fromFileSync('./config/rbac.json')
-```
-
 #### validateConfig
 
-**v2.2.0** - Validate PresetConfig structure.
+Validate PresetConfig structure.
 
 ```typescript
 static validateConfig(config: PresetConfig): void
@@ -299,13 +264,13 @@ const user = { id: '1', roles: ['admin'] }
 const hasFullAccess = rbac.hasAllPermissions(user, ['posts:read', 'posts:write', 'posts:delete'])
 ```
 
-### Deny Permissions (v2.2.0)
+### Deny Permissions
 
 Deny permissions allow you to explicitly revoke specific permissions for individual users, even if their roles grant them. Denies always take precedence over allows.
 
 #### denyPermission
 
-**v2.2.0** - Deny a specific permission for a user.
+Deny a specific permission for a user.
 
 ```typescript
 denyPermission(userId: string, permission: string): void
@@ -330,7 +295,7 @@ rbac.hasPermission(user, 'posts:delete') // false
 
 #### allowPermission
 
-**v2.2.0** - Remove a denied permission for a user.
+Remove a denied permission for a user.
 
 ```typescript
 allowPermission(userId: string, permission: string): void
@@ -347,7 +312,7 @@ rbac.hasPermission(user, 'posts:delete') // true (if role grants it)
 
 #### getDeniedPermissions
 
-**v2.2.0** - Get all denied permissions for a user.
+Get all denied permissions for a user.
 
 ```typescript
 getDeniedPermissions(userId: string): string[]
@@ -363,7 +328,7 @@ console.log(deniedPerms) // ['posts:delete', 'users:ban']
 
 #### clearDeniedPermissions
 
-**v2.2.0** - Clear all denied permissions for a user.
+Clear all denied permissions for a user.
 
 ```typescript
 clearDeniedPermissions(userId: string): void
@@ -375,13 +340,13 @@ rbac.clearDeniedPermissions('user-123')
 // All denies removed, user permissions back to role-based
 ```
 
-### Cache Management (v2.2.0)
+### Cache Management
 
 When `enableCache: true` is set, permission checks are cached for better performance.
 
 #### invalidateUserCache
 
-**v2.2.0** - Invalidate all cached permission checks for a specific user.
+Invalidate all cached permission checks for a specific user.
 
 ```typescript
 invalidateUserCache(userId: string): void
@@ -395,7 +360,7 @@ rbac.invalidateUserCache('user-123')
 
 #### invalidatePermissionCache
 
-**v2.2.0** - Invalidate cached checks for a specific permission across all users.
+Invalidate cached checks for a specific permission across all users.
 
 ```typescript
 invalidatePermissionCache(permission: string): void
@@ -409,7 +374,7 @@ rbac.invalidatePermissionCache('posts:delete')
 
 #### getCacheStats
 
-**v2.2.0** - Get cache statistics.
+Get cache statistics.
 
 ```typescript
 getCacheStats(): CacheStats | undefined
@@ -430,13 +395,13 @@ console.log(stats)
 // }
 ```
 
-### Lazy Role Evaluation (v2.2.0)
+### Lazy Role Evaluation
 
 When `lazyRoles: true` is set, roles are only evaluated when first accessed, reducing initial load time and memory usage.
 
 #### getEvaluatedRoles
 
-**v2.2.0** - Get list of roles that have been evaluated.
+Get list of roles that have been evaluated.
 
 ```typescript
 getEvaluatedRoles(): string[]
@@ -450,7 +415,7 @@ console.log(evaluated) // ['admin', 'editor']
 
 #### getPendingRoles
 
-**v2.2.0** - Get list of roles not yet evaluated.
+Get list of roles not yet evaluated.
 
 ```typescript
 getPendingRoles(): string[]
@@ -464,7 +429,7 @@ console.log(pending) // ['viewer', 'guest', 'moderator']
 
 #### getLazyRoleStats
 
-**v2.2.0** - Get lazy role evaluation statistics.
+Get lazy role evaluation statistics.
 
 ```typescript
 getLazyRoleStats(): LazyRoleStats
@@ -486,7 +451,7 @@ console.log(stats)
 
 #### isRolePending
 
-**v2.2.0** - Check if a role is pending evaluation.
+Check if a role is pending evaluation.
 
 ```typescript
 isRolePending(roleName: string): boolean
@@ -501,7 +466,7 @@ if (rbac.isRolePending('viewer')) {
 
 #### evaluateAllRoles
 
-**v2.2.0** - Force evaluation of all pending roles.
+Force evaluation of all pending roles.
 
 ```typescript
 evaluateAllRoles(): void
@@ -513,13 +478,13 @@ evaluateAllRoles(): void
 rbac.evaluateAllRoles()
 ```
 
-### Memory Optimization (v2.2.0)
+### Memory Optimization
 
 When `optimizeMemory: true` is set, Fire Shield uses string interning and other techniques to reduce memory usage.
 
 #### getMemoryStats
 
-**v2.2.0** - Get memory optimization statistics.
+Get memory optimization statistics.
 
 ```typescript
 getMemoryStats(): MemoryStats
@@ -542,7 +507,7 @@ console.log(stats)
 
 #### compactMemory
 
-**v2.2.0** - Compact memory by cleaning up unused resources.
+Compact memory by cleaning up unused resources.
 
 ```typescript
 compactMemory(): { stringsRemoved: number; cacheEntriesRemoved: number }
@@ -804,7 +769,7 @@ throw new RBACError('Invalid permission format', 'INVALID_PERMISSION')
 
 ## Performance
 
-Fire Shield v2.2.0 includes several performance optimizations for large-scale applications.
+Fire Shield includes several performance optimizations for large-scale applications.
 
 ### Bit-Level Permissions
 
@@ -821,9 +786,9 @@ const user = { id: '1', roles: ['admin'] }
 rbac.hasPermission(user, 'posts:write') // Optimized bit check
 ```
 
-### Permission Caching (v2.2.0)
+### Permission Caching
 
-**v2.2.0** introduces explicit permission caching with TTL and size limits:
+Fire Shield includes explicit permission caching with TTL and size limits:
 
 ```typescript
 const rbac = new RBAC({
@@ -846,9 +811,9 @@ const stats = rbac.getCacheStats()
 console.log(`Hit rate: ${stats.hitRate * 100}%`)
 ```
 
-### Lazy Role Evaluation (v2.2.0)
+### Lazy Role Evaluation
 
-**v2.2.0** supports lazy role evaluation for faster startup:
+Fire Shield supports lazy role evaluation for faster startup:
 
 ```typescript
 const rbac = new RBAC({
@@ -864,9 +829,9 @@ console.log(`Loaded: ${stats.evaluated}/${stats.total} roles`)
 rbac.evaluateAllRoles()
 ```
 
-### Memory Optimization (v2.2.0)
+### Memory Optimization
 
-**v2.2.0** includes memory optimization through string interning:
+Fire Shield includes memory optimization through string interning:
 
 ```typescript
 const rbac = new RBAC({
@@ -917,8 +882,8 @@ setInterval(() => {
 ## Next Steps
 
 - Learn about [Permissions](/guide/permissions)
-- Understand [Deny Permissions](/guide/deny-permissions) (v2.2.0)
+- Understand [Deny Permissions](/guide/deny-permissions)
 - Explore [Framework Integrations](/frameworks/vue)
-- Use the [CLI Tool](/frameworks/cli) for config validation (v2.2.0)
-- Integrate with [AI Agents via MCP](/frameworks/mcp) (v2.2.0)
+- Use [CLI Tool](/frameworks/cli) for config validation
+- Integrate with [AI Agents via MCP](/frameworks/mcp)
 - Check out [Examples](/examples/basic-usage)

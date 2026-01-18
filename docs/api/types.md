@@ -4,6 +4,132 @@ Complete TypeScript type definitions for Fire Shield RBAC library.
 
 ## Core Types
 
+### IRBAC
+
+**v3.0.0** - Core interface for RBAC implementations. Enables polymorphic usage of RBAC and RBACAggregator.
+
+```typescript
+interface IRBAC {
+  /**
+   * Register a new permission
+   */
+  registerPermission(permissionName: string): void;
+
+  /**
+   * Create a new role with permissions
+   */
+  createRole(roleName: string, permissions: string[]): void;
+
+  /**
+   * Check if user has a specific permission
+   */
+  hasPermission(user: RBACUser, permission: string): boolean;
+
+  /**
+   * Check if user has all specified permissions
+   */
+  hasAllPermissions(user: RBACUser, permissions: string[]): boolean;
+
+  /**
+   * Check if user has any of the specified permissions
+   */
+  hasAnyPermission(user: RBACUser, permissions: string[]): boolean;
+
+  /**
+   * Authorize user with detailed result
+   */
+  authorize(user: RBACUser, permission: string): AuthorizationResult;
+
+  /**
+   * Grant permission to role
+   */
+  grantPermission(roleName: string, permission: string): void;
+
+  /**
+   * Revoke permission from role
+   */
+  revokePermission(roleName: string, permission: string): void;
+
+  /**
+   * Get all registered permissions
+   */
+  getPermissions(): string[];
+
+  /**
+   * Get all registered roles
+   */
+  getRoles(): string[];
+
+  /**
+   * Get all permissions for a user
+   */
+  getUserPermissions(user: RBACUser): string[];
+
+  /**
+   * Deny permission for user
+   */
+  denyPermission(userId: string, permission: string): void;
+
+  /**
+   * Remove denied permission for user
+   */
+  allowPermission(userId: string, permission: string): void;
+
+  /**
+   * Get denied permissions for user
+   */
+  getDeniedPermissions(userId: string): string[];
+}
+```
+
+**Purpose:** The `IRBAC` interface defines the contract that all RBAC implementations must follow. It enables polymorphic usage, allowing you to use `RBAC` and `RBACAggregator` interchangeably.
+
+**Implementations:**
+- `RBAC` - Standard RBAC implementation
+- `RBACAggregator` - Multi-domain RBAC aggregator
+
+**Example - Polymorphic Usage:**
+```typescript
+import { RBAC, RBACAggregator, type IRBAC } from '@fire-shield/core';
+
+function setupPermissions(instance: IRBAC) {
+  instance.registerPermission('posts:read');
+  instance.registerPermission('posts:write');
+  instance.createRole('editor', ['posts:read', 'posts:write']);
+}
+
+// Works with RBAC
+const rbac = new RBAC();
+setupPermissions(rbac);
+
+// Also works with RBACAggregator
+const aggregator = new RBACAggregator();
+aggregator.addInstance('default', new RBAC());
+setupPermissions(aggregator); // ✅ Polymorphic!
+```
+
+**Example - Framework Adaptor Integration:**
+```typescript
+import { type IRBAC } from '@fire-shield/core';
+import { RBACProvider } from '@fire-shield/react';
+
+// Accept any IRBAC implementation
+function createRBACAdapter(rbacInstance: IRBAC) {
+  return (
+    <RBACProvider rbac={rbacInstance}>
+      <App />
+    </RBACProvider>
+  );
+}
+
+// Can use RBAC or RBACAggregator
+const rbac = new RBAC();
+const aggregator = new RBACAggregator();
+
+createRBACAdapter(rbac);       // ✅ Works
+createRBACAdapter(aggregator); // ✅ Also works
+```
+
 ### RBACUser
 
 Represents a user in the RBAC system.
