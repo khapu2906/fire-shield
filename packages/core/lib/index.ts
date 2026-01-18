@@ -3,6 +3,7 @@ import { BitPermissionManager } from './core/bit-permission-manager';
 import { RoleHierarchy } from './core/role-hierarchy';
 import type { RBACConfigSchema, PresetConfig, RBACSystemState } from './types/config.types';
 import type { AuditLogger, AuditEvent } from './types/audit.types';
+import type { IRBAC } from './types/rbac.interface';
 import { WildcardMatcher } from './utils/wildcard-matcher';
 import { PermissionCache, type PermissionCacheOptions } from './utils/permission-cache';
 import { MemoryOptimizer } from './utils/memory-optimizer';
@@ -173,7 +174,7 @@ export class RoleManager {
  * Main RBAC class for managing authorization
  * Pure logic with no storage dependencies
  */
-export class RBAC {
+export class RBAC implements IRBAC {
   private roleManager?: RoleManager;
   private customPermissions?: PermissionManager;
   private bitPermissionManager?: BitPermissionManager;
@@ -685,6 +686,18 @@ export class RBAC {
   }
 
   /**
+   * Get all registered permissions
+   */
+  getPermissions(): string[] {
+    if (this.useBitSystem && this.bitPermissionManager) {
+      return this.bitPermissionManager.getAllPermissions();
+    } else if (this.customPermissions) {
+      return this.customPermissions.getAll();
+    }
+    return [];
+  }
+
+  /**
    * Get all registered roles
    */
   getAllRoles(): string[] {
@@ -694,6 +707,13 @@ export class RBAC {
       return Array.from(this.roleManager['roles'].keys()); // Access private roles map
     }
     return [];
+  }
+
+  /**
+   * Get all registered roles (IRBAC interface compatibility)
+   */
+  getRoles(): string[] {
+    return this.getAllRoles();
   }
 
   /**
@@ -982,21 +1002,45 @@ export class RBAC {
   }
 
   /**
-   * Invalidate cache for specific user
+   * Grant permission to a role (IRBAC interface)
    */
-  invalidateUserCache(userId: string): void {
-    if (this.cache) {
-      this.cache.invalidate(userId);
+  grantPermission(roleName: string, permission: string): void {
+    this.addPermissionToRole(roleName, permission);
+  }
+
+  /**
+   * Revoke permission from a role (IRBAC interface)
+   */
+  revokePermission(roleName: string, permission: string): void {
+    if (this.useBitSystem) {
+      const currentPermissions = this.bitPermissionManager?.getRolePermissions(roleName) ?? [];
+      const newPermissions = currentPermissions.filter(perm => perm !== permission);
+      this.bitPermissionManager?.registerRole(roleName, newPermissions);
+    } else {
+      const currentPermissions = this.roleManager?.getRolePermissions(roleName) ?? [];
+      const newPermissions = currentPermissions.filter(perm => perm !== permission);
+      this.roleManager?.createRole(roleName, newPermissions);
     }
   }
 
   /**
-   * Invalidate cache for specific permission across all users
+   * Get permissions for a user (IRBAC interface)
    */
-  invalidatePermissionCache(permission: string): void {
-    if (this.cache) {
-      this.cache.invalidatePermission(permission);
+  getUserPermissions(user: RBACUser): string[] {
+    const permissions = new Set<string>();
+
+    // Add direct permissions
+    if (user.permissions) {
+      user.permissions.forEach(perm => permissions.add(perm));
     }
+
+    // Add role-based permissions
+    for (const role of user.roles) {
+      const rolePerms = this.getRolePermissions(role);
+      rolePerms.forEach(perm => permissions.add(perm));
+    }
+
+    return Array.from(permissions);
   }
 
   /**
@@ -1184,3 +1228,18 @@ export {
 	AsyncLogger,
 	SamplingLogger
 } from './utils/audit-log-examples';
+
+// Export RBACAggregator for managing multiple RBAC instances
+export {
+	RBACAggregator
+} from './utils/rbac-aggregator';
+
+export type {
+	RBACDomain,
+	RBACInstanceFactory,
+	RBACAggregatorOptions,
+	AggregatedPermissionResult
+} from './utils/rbac-aggregator';
+
+// Export IRBAC interface for polymorphism
+export { IRBAC } from './types/rbac.interface';

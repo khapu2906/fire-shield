@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/core",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Fire Shield - A powerful, flexible RBAC (Role-Based Access Control) library with lightning-fast bit-based permissions, wildcards, audit logging, and zero dependencies",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
