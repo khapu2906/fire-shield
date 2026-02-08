@@ -1,7 +1,7 @@
 {
   "name": "@fire-shield/nuxt",
-  "version": "2.1.1",
-  "description": "Nuxt.js adapter for RBAC authorization",
+  "version": "3.1.0",
+  "description": "Nuxt.js adapter for RBAC authorization with composables",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -11,11 +11,14 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": ["rbac", "nuxt", "middleware", "authorization"],
+  "keywords": ["rbac", "nuxt", "authorization", "composables", "guards"],
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
+  },
+  "peerDependencies": {
+    "nuxt": "^3.0.0"
   },
   "devDependencies": {
     "@nuxt/kit": "^3.0.0",
@@ -25,11 +28,6 @@
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
-  },
-  "peerDependencies": {
-    "@nuxt/kit": "^3.0.0",
-    "h3": "^1.0.0",
-    "nuxt": "^3.0.0"
   },
   "repository": {
     "type": "git",

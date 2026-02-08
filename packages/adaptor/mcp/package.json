@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/mcp",
-  "version": "2.2.2",
+  "version": "3.1.0",
   "description": "Model Context Protocol (MCP) adapter for Fire Shield RBAC - AI agent integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,6 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -24,26 +23,30 @@
     "agents",
     "authorization",
     "permissions",
-    "access-control",
-    "fire-shield"
+    "fire-shield",
+    "access-control"
   ],
   "author": "Fire Shield Team",
   "license": "DIB",
   "repository": {
     "type": "git",
-    "url": "https://github.com/khapu2906/RBAC.git",
+    "url": "https://github.com/khapu2906/fire-shield.git",
     "directory": "packages/adaptor/mcp"
   },
+  "homepage": "https://github.com/khapu2906/fire-shield#readme",
+  "bugs": {
+    "url": "https://github.com/khapu2906/fire-shield/issues"
+  },
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": ">=0.5.0"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.23.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
     "vitest": "^1.0.4"
-  },
-  "peerDependencies": {
-    "@modelcontextprotocol/sdk": ">=0.5.0"
   }
 }

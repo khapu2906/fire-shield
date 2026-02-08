@@ -1,9 +1,8 @@
 {
   "name": "@fire-shield/svelte",
-  "version": "2.1.1",
-  "description": "Svelte adapter for RBAC with stores, actions, and reactive state",
+  "version": "3.1.0",
+  "description": "Svelte adapter for RBAC authorization with stores and components",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
@@ -11,23 +10,20 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "files": [
-    "dist"
-  ],
-  "keywords": ["rbac", "svelte", "stores", "actions", "authorization"],
+  "keywords": ["rbac", "svelte", "stores", "authorization", "guards"],
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
-  },
-  "devDependencies": {
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
-    "svelte": "^4.0.0"
+    "@fire-shield/core": "^3.1.0"
   },
   "peerDependencies": {
-    "svelte": "^4.0.0 || ^5.0.0"
+    "svelte": "^4.0.0"
+  },
+  "devDependencies": {
+    "svelte": "^4.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/react-native",
-  "version": "2.2.3",
+  "version": "3.1.0",
   "description": "React Native adapter for Fire Shield RBAC with hooks and components",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -35,14 +35,15 @@
   "author": "khapu2906",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0",
     "react-native": ">=0.70.0"
   },
   "devDependencies": {
-    "@testing-library/react": "^14.0.0",
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@testing-library/react": "^14.3.1",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/react-native": "^11.5.4",
     "@types/node": "^22.5.1",
@@ -50,7 +51,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.3.1",
     "react-native": "^0.73.0",
-    "react-test-renderer": "^18.2.0",
+    "react-test-renderer": "^18.3.1",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4",
     "vitest": "^1.6.1"

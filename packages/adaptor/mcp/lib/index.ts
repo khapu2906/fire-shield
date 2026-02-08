@@ -485,6 +485,10 @@ export async function createMCPServer(
  * Standalone server entry point
  */
 export async function startStandalone(config: PresetConfig): Promise<void> {
-  const rbac = new RBAC({ preset: config });
+  const rbac = new RBAC({
+    preset: config,
+    enableCache: true,      // Enable performance optimization
+    optimizeMemory: true    // Enable memory optimization
+  });
   await createMCPServer({ rbac, debug: true });
 }

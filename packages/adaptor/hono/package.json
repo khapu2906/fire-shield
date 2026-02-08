@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/hono",
-  "version": "2.1.1",
+  "version": "3.1.0",
   "description": "Hono adapter for RBAC authorization middleware",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,28 +13,19 @@
   "files": [
     "dist"
   ],
-  "keywords": ["rbac", "hono", "middleware", "authorization"],
+  "keywords": ["rbac", "hono", "authorization", "middleware", "guards"],
   "author": "Fire Shield Team",
   "license": "DIB",
-  "peerDependencies": {
-    "hono": "^4.10.6"
-  },
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0"
   },
   "devDependencies": {
     "hono": "^4.10.6",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/khapu2906/fire-shield.git",
-    "directory": "packages/adaptor/hono"
-  },
-  "homepage": "https://github.com/khapu2906/fire-shield#readme",
-  "bugs": {
-    "url": "https://github.com/khapu2906/fire-shield/issues"
   }
 }

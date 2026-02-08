@@ -1,6 +1,6 @@
 {
   "name": "@fire-shield/next",
-  "version": "2.1.1",
+  "version": "3.1.0",
   "description": "Next.js adapter for RBAC authorization",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -11,20 +11,20 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": ["rbac", "nextjs", "middleware", "authorization"],
+  "keywords": ["rbac", "nextjs", "authorization", "middleware", "guards"],
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
+  },
+  "peerDependencies": {
+    "next": "^13.0.0 || ^14.0.0 || ^15.0.0"
   },
   "devDependencies": {
     "next": "^14.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
-  },
-  "peerDependencies": {
-    "next": "^13.0.0 || ^14.0.0 || ^15.0.0"
   },
   "repository": {
     "type": "git",

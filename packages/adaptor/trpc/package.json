@@ -1,50 +1,44 @@
 {
   "name": "@fire-shield/trpc",
-  "version": "2.2.2",
-  "description": "tRPC adapter for Fire Shield RBAC with type-safe middleware",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "version": "3.1.0",
+  "description": "tRPC adapter for RBAC authorization with procedures",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "rbac",
     "trpc",
-    "access-control",
-    "permissions",
+    "authorization",
+    "procedures",
     "fire-shield",
-    "middleware",
-    "type-safe"
+    "access-control"
   ],
-  "author": "khapu2906",
+  "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
   },
   "peerDependencies": {
     "@trpc/server": "^10.0.0"
   },
   "devDependencies": {
-    "@trpc/server": "^10.45.0",
-    "@types/node": "^22.5.1",
-    "tsup": "^8.2.4",
-    "typescript": "^5.5.4",
-    "vitest": "^1.6.1",
-    "zod": "^3.22.4"
+    "@trpc/server": "^10.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khapu2906/fire-shield.git",
+    "directory": "packages/adaptor/trpc"
+  },
+  "homepage": "https://github.com/khapu2906/fire-shield#readme",
+  "bugs": {
+    "url": "https://github.com/khapu2906/fire-shield/issues"
   }
 }

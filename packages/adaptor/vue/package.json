@@ -1,9 +1,8 @@
 {
   "name": "@fire-shield/vue",
-  "version": "2.1.1",
-  "description": "Vue adapter for RBAC with composables, directives, and navigation guards",
+  "version": "3.1.0",
+  "description": "Vue adapter for RBAC authorization with composables, directives, and router guards. Features: Plugin system, Advanced audit logging (3 types), Wildcards, Deny permissions, Permission caching, Lazy roles, Memory optimization, RBACAggregator support",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
@@ -14,29 +13,34 @@
   "files": [
     "dist"
   ],
-  "keywords": ["rbac", "vue", "composables", "directives", "guards", "authorization", "vue-router"],
+  "keywords": [
+    "rbac",
+    "vue",
+    "authorization",
+    "composables",
+    "guards",
+    "directives",
+    "fire-shield",
+    "access-control",
+    "plugin",
+    "caching",
+    "wildcards",
+    "deny"
+  ],
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
-  },
-  "devDependencies": {
-    "@vue/test-utils": "^2.4.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "happy-dom": "^12.0.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "@fire-shield/core": "^3.0.0"
   },
   "peerDependencies": {
     "vue": "^3.0.0"
   },
-  "peerDependenciesMeta": {
-    "vue-router": {
-      "optional": true
-    }
+  "devDependencies": {
+    "@types/node": "^22.5.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "vue": "^3.0.0"
   },
   "repository": {
     "type": "git",

@@ -1,43 +1,49 @@
 {
   "name": "@fire-shield/react",
-  "version": "2.1.1",
-  "description": "React adapter for RBAC with hooks, components, and route guards",
+  "version": "3.1.0",
+  "description": "React adapter for Fire Shield RBAC with hooks, HOCs, and components. Features: Plugin system, Advanced audit logging, Wildcards, Deny permissions, Permission caching, Lazy roles, Memory optimization, RBACAggregator support",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run --environment happy-dom --globals",
-    "test:watch": "vitest --environment happy-dom --globals"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "files": [
     "dist"
   ],
-  "keywords": ["rbac", "react", "hooks", "guards", "authorization", "react-router"],
+  "keywords": [
+    "rbac",
+    "react",
+    "authorization",
+    "permissions",
+    "hooks",
+    "hoc",
+    "fire-shield",
+    "access-control",
+    "plugin",
+    "caching",
+    "wildcards",
+    "deny"
+  ],
   "author": "Fire Shield Team",
   "license": "DIB",
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
-  },
-  "devDependencies": {
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/jest-dom": "^6.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "happy-dom": "^12.0.0"
+    "@fire-shield/core": "^3.0.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"
   },
-  "peerDependenciesMeta": {
-    "react-router-dom": {
-      "optional": true
-    }
+  "devDependencies": {
+    "@testing-library/react": "^14.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   },
   "repository": {
     "type": "git",

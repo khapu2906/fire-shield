@@ -1,55 +1,39 @@
 {
   "name": "@fire-shield/sveltekit",
-  "version": "2.2.2",
-  "description": "SvelteKit adapter for Fire Shield RBAC - Server-side hooks and page guards",
+  "version": "3.1.0",
+  "description": "SvelteKit adapter for RBAC authorization",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": [
-    "rbac",
-    "sveltekit",
-    "svelte",
-    "authorization",
-    "permissions",
-    "access-control",
-    "fire-shield",
-    "server-hooks",
-    "page-guards"
-  ],
+  "keywords": ["rbac", "sveltekit", "authorization", "hooks"],
   "author": "Fire Shield Team",
   "license": "DIB",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/khapu2906/RBAC.git",
-    "directory": "packages/adaptor/sveltekit"
-  },
   "dependencies": {
-    "@fire-shield/core": "^2.2.2"
+    "@fire-shield/core": "^3.1.0"
+  },
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.0.0"
   },
   "devDependencies": {
     "@sveltejs/kit": "^2.0.0",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "svelte": "^4.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   },
-  "peerDependencies": {
-    "@sveltejs/kit": "^1.0.0 || ^2.0.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khapu2906/fire-shield.git",
+    "directory": "packages/adaptor/sveltekit"
+  },
+  "homepage": "https://github.com/khapu2906/fire-shield#readme",
+  "bugs": {
+    "url": "https://github.com/khapu2906/fire-shield/issues"
   }
 }

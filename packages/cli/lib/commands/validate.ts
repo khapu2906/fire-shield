@@ -51,24 +51,16 @@ export async function validateCommand(file: string, options: ValidateOptions) {
       process.exit(1);
     }
 
-    // Validate config structure
+    // Validate config and instantiate RBAC with performance optimizations
     try {
-      RBAC.validateConfig(config);
-    } catch (error: any) {
-      console.log(chalk.red('✖ Validation failed\n'));
-      console.log(chalk.red(`  ${error.message}`));
-      process.exit(1);
-    }
-
-    // Try to instantiate RBAC
-    try {
-      new RBAC({
-        preset: config,
+      const rbac = RBAC.fromJSONConfig(JSON.stringify(config), {
         strictMode: options.strict,
-        useBitSystem: true
+        useBitSystem: true,
+        enableCache: true,      // Enable performance optimization
+        optimizeMemory: true    // Enable memory optimization
       });
     } catch (error: any) {
-      console.log(chalk.red('✖ RBAC instantiation failed\n'));
+      console.log(chalk.red('✖ Configuration is invalid\n'));
       console.log(chalk.red(`  ${error.message}`));
       process.exit(1);
     }

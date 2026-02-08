@@ -68,12 +68,13 @@ export async function checkCommand(file: string, options: CheckOptions) {
       process.exit(1);
     }
 
-    // Initialize RBAC
+    // Initialize RBAC with performance optimizations
     let rbac: RBAC;
     try {
-      rbac = new RBAC({
-        preset: config,
-        useBitSystem: true
+      rbac = RBAC.fromJSONConfig(JSON.stringify(config), {
+        useBitSystem: true,
+        enableCache: true,      // Enable performance optimization
+        optimizeMemory: true    // Enable memory optimization
       });
     } catch (error: any) {
       console.log(chalk.red('✖ Failed to initialize RBAC'));
