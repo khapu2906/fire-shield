@@ -1,7 +1,7 @@
 import { RBAC } from '../index';
 import type { PermissionConfig, RBACConfigSchema, PresetConfig } from '../types/config.types';
 import type { RoleConfig } from '../types/role.types';
-
+import type { AuditLogger } from '../types/audit.types'
 /**
  * Fluent API builder for RBAC system
  * Provides a convenient way to configure RBAC with method chaining
@@ -26,7 +26,7 @@ export class RBACBuilder {
 	private strictMode: boolean = false;
 	private autoBitAssignment: boolean = true;
 	private wildcardsEnabled: boolean = true;
-	private auditLogger?: import('../types/audit.types').AuditLogger;
+	private auditLogger?: AuditLogger;
 	private currentRole?: string;
 
 	// Fluent API state
