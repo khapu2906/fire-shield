@@ -1,8 +1,8 @@
-# 🛡️ Fire Shield v3.0.0
+# 🛡️ Fire Shield v3.1.1
 
 A powerful, flexible, and type-safe Role-Based Access Control (RBAC) library for TypeScript/JavaScript applications. Features a high-performance bit-based permission system with dynamic role hierarchies, plugin architecture, and zero storage dependencies.
 
-> **Fire Shield v3.0.0** - Protect your application with lightning-fast permission checks and extensible plugin system ⚡
+> **Fire Shield v3.1.1** - Protect your application with lightning-fast permission checks and extensible plugin system ⚡
 
 ## ✨ What's New in v3.0.0
 
@@ -263,8 +263,8 @@ const cacheStats = rbac.getCacheStats();
 console.log(cacheStats);
 // { hits: 1250, misses: 50, size: 100, hitRate: 96.15 }
 
-// Clear cache when roles/permissions change
-rbac.clearPermissionCache();
+// Compact cache when roles/permissions change
+rbac.compactMemory();
 ```
 
 ### 🆕 Memory Optimization (v2.2.0)

@@ -9,6 +9,7 @@ Complete type reference for RBAC library.
 - [Configuration Types](#configuration-types)
 - [Audit Types](#audit-types)
 - [Utility Types](#utility-types)
+- [Plugin Types](#plugin-types)
 
 ---
 
@@ -89,47 +90,69 @@ if (!result.allowed) {
 
 ---
 
-### AuthorizationContext
+### RBACContext
 
-Context for authorization with additional metadata.
+Context for authorization checks — all fields are optional to allow partial context.
 
 ```typescript
-interface AuthorizationContext {
-  /**
-   * User to check authorization for
-   */
-  user: RBACUser;
+interface RBACContext {
+  /** User to check authorization for */
+  user?: RBACUser;
 
-  /**
-   * Resource being accessed
-   */
-  resource: string;
+  /** Resource being accessed (e.g. 'document', 'post') */
+  resource?: string;
 
-  /**
-   * Action being performed
-   */
-  action: string;
+  /** Action being performed (e.g. 'read', 'write', 'delete') */
+  action?: string;
 
-  /**
-   * Optional additional context
-   */
-  metadata?: Record<string, any>;
+  /** Direct permission string (alternative to resource+action pattern) */
+  permission?: string;
 }
 ```
 
 **Example:**
 ```typescript
-const context: AuthorizationContext = {
+import { type RBACContext } from '@fire-shield/core';
+
+const context: RBACContext = {
   user: currentUser,
   resource: 'document',
   action: 'edit',
-  metadata: {
-    documentId: 'doc-123',
-    ownerId: 'user-456'
-  }
 };
 
 const result = rbac.authorizeWithContext(context);
+```
+
+---
+
+### MiddlewareContext
+
+Extended context for middleware/server adaptor use — includes request and response objects.
+
+```typescript
+interface MiddlewareContext extends RBACContext {
+  /** Framework request object (e.g. FastifyRequest, Express.Request) */
+  request: any;
+
+  /** Framework response object (e.g. FastifyReply, Express.Response) */
+  response: any;
+}
+```
+
+**Import:**
+```typescript
+import { type MiddlewareContext } from '@fire-shield/core';
+```
+
+**Example (Fastify):**
+```typescript
+const ctx: MiddlewareContext = {
+  user,
+  resource: 'posts',
+  action: 'delete',
+  request,
+  response: reply,
+};
 ```
 
 ---
@@ -801,35 +824,87 @@ const event: AuditEvent = {
 
 ---
 
+## Plugin Types
+
+### RBACPlugin
+
+Interface for implementing RBAC plugins. Plugins can extend core functionality with hooks triggered during permission checks, role creation, and permission registration.
+
+```typescript
+interface RBACPlugin {
+  /** Unique plugin name */
+  name: string;
+
+  /** Plugin version (optional) */
+  version?: string;
+
+  /** Called once when plugin is registered */
+  initialize?(rbac: RBAC): void | Promise<void>;
+
+  /** Hook called after each permission check */
+  onPermissionCheck?(event: any): void | Promise<void>;
+
+  /** Hook called when a role is added */
+  onRoleAdded?(roleName: string, permissions: string[]): void | Promise<void>;
+
+  /** Hook called when a permission is registered */
+  onPermissionRegistered?(permissionName: string, bit: number): void | Promise<void>;
+
+  /** Called when plugin is unregistered — clean up resources here */
+  cleanup?(): void | Promise<void>;
+}
+```
+
+**Example:**
+```typescript
+import { type RBACPlugin } from '@fire-shield/core';
+
+const analyticsPlugin: RBACPlugin = {
+  name: 'analytics',
+  version: '1.0.0',
+  async onPermissionCheck(event) {
+    await analytics.track('permission_check', {
+      userId: event.userId,
+      permission: event.permission,
+      allowed: event.allowed,
+    });
+  },
+};
+
+await rbac.registerPlugin(analyticsPlugin);
+```
+
+---
+
 ## Import Paths
 
 ```typescript
 // Core types
 import type {
   RBACUser,
+  RBACContext,
+  MiddlewareContext,
   AuthorizationResult,
-  AuthorizationContext
 } from '@fire-shield/core';
+
+// Plugin types
+import type { RBACPlugin } from '@fire-shield/core';
 
 // Configuration types
 import type {
-  RBACConfig,
   RBACConfigSchema,
-  PresetConfig
+  PresetConfig,
 } from '@fire-shield/core';
 
 // Audit types
 import type {
   AuditEvent,
-  AuditEventContext,
-  AuditLogger
+  AuditLogger,
 } from '@fire-shield/core';
 
 // Utility types
 import type {
   RBACSystemState,
-  PermissionDefinition,
-  RoleDefinition
 } from '@fire-shield/core';
 ```
 

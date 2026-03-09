@@ -1178,7 +1178,7 @@ export { MemoryOptimizer } from './utils/memory-optimizer';
 export { PluginManager, RBACPlugin } from './plugins/rbac-plugin';
 
 // Export types
-export type { UserRole } from './types/user.types';
+export type { UserRole, MiddlewareContext } from './types/user.types';
 export type { PermissionMask } from './types/utility.types';
 export type {
   RBACConfigSchema,

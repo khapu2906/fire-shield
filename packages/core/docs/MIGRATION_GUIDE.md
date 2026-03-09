@@ -4,12 +4,111 @@ Guide for upgrading to the latest version of RBAC library.
 
 ## Table of Contents
 
+- [Upgrading to v3.1.1 (MiddlewareContext & Adaptor Sync)](#upgrading-to-v311-middlewarecontext--adaptor-sync)
+- [Upgrading to v3.0.0 (Plugin System)](#upgrading-to-v300-plugin-system)
 - [Upgrading to v2.2.0 (Performance & Optimization)](#upgrading-to-v220-performance--optimization)
 - [Upgrading to v2.0 (Advanced Features)](#upgrading-to-v20-advanced-features)
 - [Breaking Changes](#breaking-changes)
 - [New Features](#new-features)
 - [Deprecations](#deprecations)
 - [Migration Steps](#migration-steps)
+
+---
+
+## Upgrading to v3.1.1 (MiddlewareContext & Adaptor Sync)
+
+**Zero breaking changes.** All v3.0.0 code continues to work.
+
+### What's New in v3.1.1
+
+#### 1. `MiddlewareContext` exported from public API
+
+`MiddlewareContext` was previously only accessible via internal import path. It is now exported from the core public API.
+
+```typescript
+// Before v3.1.1 (internal import — fragile, avoid)
+import type { MiddlewareContext } from '@fire-shield/core/lib/types/user.types';
+
+// v3.1.1 — import from public API
+import type { MiddlewareContext } from '@fire-shield/core';
+```
+
+#### 2. Adaptor version alignment
+
+All framework adaptors (`@fire-shield/react`, `@fire-shield/vue`, `@fire-shield/angular`, etc.) now correctly depend on `^3.1.1` of core.
+
+**Update your adaptor dependencies:**
+```json
+{
+  "dependencies": {
+    "@fire-shield/core": "^3.1.1",
+    "@fire-shield/react": "^3.1.1"
+  }
+}
+```
+
+#### 3. `clearPermissionCache()` removed
+
+This method was never part of the public API. Use `compactMemory()` instead to clean up expired cache entries:
+
+```typescript
+// Before (incorrect — method does not exist)
+rbac.clearPermissionCache();
+
+// v3.1.1 — correct
+const result = rbac.compactMemory();
+// { stringsRemoved: 0, cacheEntriesRemoved: 12 }
+```
+
+---
+
+## Upgrading to v3.0.0 (Plugin System)
+
+**Zero breaking changes.** All v2.x code continues to work.
+
+### What's New in v3.0.0
+
+#### Plugin System
+
+Register plugins to extend RBAC with lifecycle hooks — useful for analytics, audit logging, monitoring, and more.
+
+```typescript
+import { RBAC, type RBACPlugin } from '@fire-shield/core';
+
+const auditPlugin: RBACPlugin = {
+  name: 'audit',
+  version: '1.0.0',
+
+  async initialize(rbac) {
+    console.log('Audit plugin initialized');
+  },
+
+  async onPermissionCheck(event) {
+    await auditLog.write({
+      userId: event.userId,
+      permission: event.permission,
+      allowed: event.allowed,
+      timestamp: event.timestamp,
+    });
+  },
+
+  async onRoleAdded(roleName, permissions) {
+    await auditLog.write({ event: 'role_added', roleName, permissions });
+  },
+
+  async cleanup() {
+    await auditLog.flush();
+  },
+};
+
+await rbac.registerPlugin(auditPlugin);
+```
+
+**New API Methods (v3.0.0):**
+- `registerPlugin(plugin)` - Register a plugin
+- `unregisterPlugin(pluginName)` - Remove a plugin (calls `cleanup()`)
+- `getPlugin(pluginName)` - Get plugin by name
+- `getAllPlugins()` - Get all registered plugins
 
 ---
 
@@ -91,14 +190,14 @@ rbac.hasPermission(user, 'post:read');
 const stats = rbac.getCacheStats();
 console.log(stats); // { hits: 1250, misses: 50, size: 100, hitRate: 96.15 }
 
-// Clear cache after role changes
+// Compact cache after role changes
 rbac.createRole('new-role', ['permission:*']);
-rbac.clearPermissionCache(); // ← Important!
+rbac.compactMemory(); // ← Clean up expired cache entries
 ```
 
 **New API Methods:**
 - `getCacheStats()` - Get cache statistics (hits, misses, size, hit rate)
-- `clearPermissionCache()` - Clear the cache
+- `compactMemory()` - Clean up expired cache and string pool entries
 
 ---
 

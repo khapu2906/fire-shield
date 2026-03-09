@@ -227,6 +227,81 @@ rbac.addPermissionToRole('editor', 'post:publish');
 
 ---
 
+#### `grantPermission(roleName, permission): void`
+
+Grant a permission to a role (alias for `addPermissionToRole`).
+
+**Parameters:**
+- `roleName: string`
+- `permission: string`
+
+**Example:**
+```typescript
+rbac.grantPermission('editor', 'post:publish');
+```
+
+---
+
+#### `revokePermission(roleName, permission): void`
+
+Revoke a permission from a role.
+
+**Parameters:**
+- `roleName: string`
+- `permission: string`
+
+**Example:**
+```typescript
+rbac.revokePermission('editor', 'post:delete');
+```
+
+---
+
+#### `getUserPermissions(user): string[]`
+
+Get the complete list of permissions for a user (direct + role-based).
+
+**Parameters:**
+- `user: RBACUser`
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const permissions = rbac.getUserPermissions(user);
+console.log(permissions); // ['post:read', 'post:write', 'beta:feature']
+```
+
+---
+
+#### `getPermissions(): string[]`
+
+Get all registered permissions in the system.
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const all = rbac.getPermissions();
+console.log(all); // ['post:read', 'post:write', 'admin:delete', ...]
+```
+
+---
+
+#### `getRoles(): string[]`
+
+Get all registered role names (alias for `getAllRoles`).
+
+**Returns:** `string[]`
+
+**Example:**
+```typescript
+const roles = rbac.getRoles();
+console.log(roles); // ['admin', 'editor', 'viewer']
+```
+
+---
+
 #### `canActAsRole(currentRole, targetRole): boolean`
 
 Check if a role can act as another role (based on hierarchy).
@@ -479,15 +554,18 @@ console.log(stats);
 
 ---
 
-#### `clearPermissionCache(): void`
+#### `compactMemory(): { stringsRemoved: number, cacheEntriesRemoved: number }`
 
-Clear the permission cache.
+Compact memory by cleaning up expired cache entries and unused string pool entries. Call this after bulk role/permission changes.
+
+**Returns:** `{ stringsRemoved: number, cacheEntriesRemoved: number }`
 
 **Example:**
 ```typescript
-// Clear cache after role/permission changes
+// Compact after bulk changes
 rbac.createRole('new-role', ['permission:*']);
-rbac.clearPermissionCache();
+const result = rbac.compactMemory();
+console.log(result); // { stringsRemoved: 0, cacheEntriesRemoved: 12 }
 ```
 
 ---
@@ -541,6 +619,76 @@ Get all permissions for a specific role.
 ```typescript
 const permissions = rbac.getRolePermissions('editor');
 console.log(permissions); // ['post:read', 'post:write']
+```
+
+---
+
+### Plugin Methods (v3.0)
+
+#### `registerPlugin(plugin): Promise<void>`
+
+Register a plugin that extends RBAC with lifecycle hooks.
+
+**Parameters:**
+- `plugin: RBACPlugin` - Plugin instance implementing `RBACPlugin` interface
+
+**Example:**
+```typescript
+import { type RBACPlugin } from '@fire-shield/core';
+
+const myPlugin: RBACPlugin = {
+  name: 'my-plugin',
+  version: '1.0.0',
+  async onPermissionCheck(event) {
+    console.log(`[${event.userId}] ${event.permission} → ${event.allowed}`);
+  },
+};
+
+await rbac.registerPlugin(myPlugin);
+```
+
+---
+
+#### `unregisterPlugin(pluginName): Promise<void>`
+
+Unregister a plugin and call its `cleanup()` hook.
+
+**Parameters:**
+- `pluginName: string` - Name of the plugin to remove
+
+**Example:**
+```typescript
+await rbac.unregisterPlugin('my-plugin');
+```
+
+---
+
+#### `getPlugin(pluginName): RBACPlugin | undefined`
+
+Get a registered plugin by name.
+
+**Parameters:**
+- `pluginName: string`
+
+**Returns:** `RBACPlugin | undefined`
+
+**Example:**
+```typescript
+const plugin = rbac.getPlugin('my-plugin');
+```
+
+---
+
+#### `getAllPlugins(): RBACPlugin[]`
+
+Get all registered plugins.
+
+**Returns:** `RBACPlugin[]`
+
+**Example:**
+```typescript
+const plugins = rbac.getAllPlugins();
+console.log(plugins.map(p => p.name)); // ['my-plugin', 'audit-plugin']
 ```
 
 ---

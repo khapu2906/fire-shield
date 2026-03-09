@@ -512,7 +512,7 @@ console.log(stats);
 
 // Clear cache when roles/permissions change
 rbac.createRole('new-role', ['permission:*']);
-rbac.clearPermissionCache();  // Invalidate cache
+rbac.compactMemory();  // Clean up expired cache entries
 ```
 
 **Cache key format:**
